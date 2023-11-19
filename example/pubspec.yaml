@@ -11,16 +11,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  cupertino_icons: ^1.0.2
   sliver_catalog:
     path: ../
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  surf_lint_rules: ^1.0.0
+  mjk_lint_rules: ^3.0.0
 
 flutter:
-  uses-material-design: true
