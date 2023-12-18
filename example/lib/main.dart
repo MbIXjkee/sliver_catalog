@@ -7,7 +7,7 @@ void main() {
 
 /// App widget.
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,30 +23,18 @@ class MyApp extends StatelessWidget {
 
 /// Screen for demonstration sliver.
 class DemoScreen extends StatelessWidget {
-  static const urls = <String>[
-    'https://www.stockvault.net/data/2018/12/30/258501/preview16.jpg',
-    'https://www.stockvault.net/data/2010/10/01/115175/preview16.jpg',
-    'https://www.stockvault.net/data/2011/04/18/122242/preview16.jpg',
-    'https://www.stockvault.net/data/2014/03/26/155336/preview16.jpg',
-    'https://www.stockvault.net/data/2018/12/30/258501/preview16.jpg',
-    'https://www.stockvault.net/data/2010/10/01/115175/preview16.jpg',
-    'https://www.stockvault.net/data/2011/04/18/122242/preview16.jpg',
-    'https://www.stockvault.net/data/2014/03/26/155336/preview16.jpg',
-    'https://www.stockvault.net/data/2018/12/30/258501/preview16.jpg',
-    'https://www.stockvault.net/data/2010/10/01/115175/preview16.jpg',
-    'https://www.stockvault.net/data/2011/04/18/122242/preview16.jpg',
-    'https://www.stockvault.net/data/2014/03/26/155336/preview16.jpg',
-  ];
-
-  const DemoScreen({Key? key}) : super(key: key);
+  const DemoScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
-        slivers: urls
-            .map(
-              (url) => Spinner(
+        slivers: _urls
+            .mapIndexed(
+              (url, index) => SpinnerSliver(
+                anchorSide: index.isOdd
+                    ? SpinnerAnchorSide.left
+                    : SpinnerAnchorSide.right,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Image.network(
@@ -60,5 +48,27 @@ class DemoScreen extends StatelessWidget {
             .toList(),
       ),
     );
+  }
+}
+
+const _urls = <String>[
+  'https://www.stockvault.net/data/2018/12/30/258501/preview16.jpg',
+  'https://www.stockvault.net/data/2010/10/01/115175/preview16.jpg',
+  'https://www.stockvault.net/data/2011/04/18/122242/preview16.jpg',
+  'https://www.stockvault.net/data/2014/03/26/155336/preview16.jpg',
+  'https://www.stockvault.net/data/2018/12/30/258501/preview16.jpg',
+  'https://www.stockvault.net/data/2010/10/01/115175/preview16.jpg',
+  'https://www.stockvault.net/data/2011/04/18/122242/preview16.jpg',
+  'https://www.stockvault.net/data/2014/03/26/155336/preview16.jpg',
+  'https://www.stockvault.net/data/2018/12/30/258501/preview16.jpg',
+  'https://www.stockvault.net/data/2010/10/01/115175/preview16.jpg',
+  'https://www.stockvault.net/data/2011/04/18/122242/preview16.jpg',
+  'https://www.stockvault.net/data/2014/03/26/155336/preview16.jpg',
+];
+
+extension _IndexedIterable<E> on Iterable<E> {
+  Iterable<T> mapIndexed<T>(T Function(E e, int i) f) {
+    var i = 0;
+    return map((e) => f(e, i++));
   }
 }

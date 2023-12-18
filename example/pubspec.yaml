@@ -1,12 +1,11 @@
 name: sliver_catalog_example
-description: Example of using sliver spinner.
-
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-
-version: 1.0.0+1
+description: A new Flutter project.
+publish_to: 'none'
+version: 0.1.0
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
 
 dependencies:
   flutter:
@@ -17,6 +16,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  mjk_lint_rules: ^3.0.0
+  mjk_lint_rules: ^3.0.1
 
 flutter:
+  uses-material-design: true

@@ -10,7 +10,7 @@ void main() {
         home: Scaffold(
           body: CustomScrollView(
             slivers: [
-              Spinner(
+              SpinnerSliver(
                 child: Container(
                   height: 200,
                 ),
@@ -27,7 +27,7 @@ void main() {
   testWidgets(
     'Use spinner in no scrollable should throw exception',
     (tester) async {
-      final widget = Spinner(
+      final widget = SpinnerSliver(
         child: Container(),
       );
 
@@ -39,13 +39,13 @@ void main() {
 
   testWidgets(
     'Move spinner out of screen should not throw exception',
-        (tester) async {
+    (tester) async {
       final key = UniqueKey();
       final widget = MaterialApp(
         home: Scaffold(
           body: CustomScrollView(
             slivers: [
-              Spinner(
+              SpinnerSliver(
                 child: Container(
                   key: key,
                   height: 400,
