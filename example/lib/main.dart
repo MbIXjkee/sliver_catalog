@@ -16,14 +16,14 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const DemoScreen(),
+      home: const DemoGliderScreen(),
     );
   }
 }
 
-/// Screen for demonstration sliver.
-class DemoScreen extends StatelessWidget {
-  const DemoScreen({super.key});
+/// Screen for demonstration spinner.
+class DemoSpinnerScreen extends StatelessWidget {
+  const DemoSpinnerScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +35,35 @@ class DemoScreen extends StatelessWidget {
                 anchorSide: index.isOdd
                     ? SpinnerAnchorSide.left
                     : SpinnerAnchorSide.right,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.network(
+                    url,
+                    fit: BoxFit.cover,
+                    height: 300,
+                  ),
+                ),
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
+}
+
+/// Screen for demonstration glider.
+class DemoGliderScreen extends StatelessWidget {
+  const DemoGliderScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: _urls
+            .mapIndexed(
+              (url, index) => GliderSliver(
+                exitSide:
+                    index.isOdd ? GliderExitSide.left : GliderExitSide.right,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Image.network(
