@@ -20,3 +20,12 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  shaders:
+    - assets/shaders/test.frag
+    - assets/shaders/another_test.frag
+    - assets/shaders/gradient.frag
+    - assets/shaders/burning.frag
+    - assets/shaders/burning_2.frag
+    - assets/shaders/freezing.frag
+  assets:
+    - assets/textures/

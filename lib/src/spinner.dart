@@ -4,12 +4,18 @@ import 'package:sliver_catalog/src/base/leaving_transform_render_sliver.dart';
 
 const double _kQuarterTurnsInRadians = math.pi / 2.0;
 
-/// The sliver widget that rotate around one of bottom corners while moving out
-/// from the screen. Widget has no own sizes, and bases all calculations on the
+/// The sliver widget that rotates around one of the latest side corners
+/// while moving out from the screen.
+/// The widget doesn't have its own size, and all calculations are based on the
 /// child dimensions.
-/// At the last moment of leaving the screen, this widget will be rotated to
-/// [maxAngle] radians around the anchor point. Before this moment rotation will
-/// be proportional to the leaved part of the widget.
+/// When the last part of this widget leaves the screen, it is rotated to
+/// [maxAngle] radians around the anchor point.
+/// Before this moment, rotation is proportional to the part of the widget that
+/// has already left the screen.
+/// If the size of the widget is bigger than the available viewport size,
+/// the rotation starts as soon as the anchor point appears in the visible
+/// part of the viewport, and the calculations of the rotation are based on the
+/// size of the visible part of the viewport.
 class SpinnerSliver extends SingleChildRenderObjectWidget {
   /// The side of the rotation point.
   final SpinnerAnchorSide anchorSide;
@@ -63,6 +69,9 @@ final class SpinnerRenderSliver extends LeavingTransformRenderSliver {
     markNeedsLayout();
   }
 
+  bool get _isReversed =>
+      constraints.normalizedGrowthDirection == GrowthDirection.reverse;
+
   SpinnerRenderSliver({
     required SpinnerAnchorSide anchorSide,
     double maxAngle = _kQuarterTurnsInRadians,
@@ -74,35 +83,55 @@ final class SpinnerRenderSliver extends LeavingTransformRenderSliver {
     final angle = _maxAngle * leavingProgress;
     final rotation = angle * (anchorSide == SpinnerAnchorSide.left ? -1 : 1);
 
-    // TODO(mjk): horizontal scrolling?
-    final translation = _calculateTranslation(
-      Size(
+    late final Size size;
+    if (constraints.axis == Axis.horizontal) {
+      size = Size(
+        geometry!.paintExtent,
+        childSize.height,
+      );
+    } else {
+      size = Size(
         childSize.width,
         geometry!.paintExtent,
-      ),
-    );
+      );
+    }
+
+    final translation = _calculateTranslation(size);
 
     return Matrix4.identity()
       ..translate(translation.dx, translation.dy)
-      ..rotateZ(rotation)
+      ..rotateZ(_isReversed ? -rotation : rotation)
       ..translate(-translation.dx, -translation.dy);
   }
 
   Offset _calculateTranslation(Size size) {
-    switch (_anchorSide) {
-      case SpinnerAnchorSide.left:
-        return FractionalOffset.bottomLeft.alongSize(size);
-      case SpinnerAnchorSide.right:
-        return FractionalOffset.bottomRight.alongSize(size);
+    late final FractionalOffset offset;
+    if (constraints.axis == Axis.horizontal) {
+      offset = _anchorSide == SpinnerAnchorSide.left
+          ? FractionalOffset.bottomRight
+          : FractionalOffset.topRight;
+    } else {
+      if (_isReversed) {
+        offset = _anchorSide == SpinnerAnchorSide.left
+            ? FractionalOffset.topLeft
+            : FractionalOffset.topRight;
+      } else {
+        offset = _anchorSide == SpinnerAnchorSide.left
+            ? FractionalOffset.bottomLeft
+            : FractionalOffset.bottomRight;
+      }
     }
+
+    return offset.alongSize(size);
   }
 }
 
-/// Describes the side of the anchor.
+// TODO: описать норм.
+/// Defines the side of the anchor relative the main axis of the viewport.
 enum SpinnerAnchorSide {
-  /// Anchor side is left.
+  /// Anchor at the left side.
   left,
 
-  /// Anchor side is right.
+  /// Anchor at the right side.
   right,
 }

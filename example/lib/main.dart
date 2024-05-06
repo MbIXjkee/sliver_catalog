@@ -1,4 +1,7 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sliver_catalog/sliver_catalog.dart';
 
 void main() {
@@ -16,7 +19,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const DemoGliderScreen(),
+      // home: const DemoLeafingScreen(shaderName: 'freezing'),
+      home: const DemoSpinnerScreen(),
     );
   }
 }
@@ -29,6 +33,7 @@ class DemoSpinnerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
+        reverse: true,
         slivers: _urls
             .mapIndexed(
               (url, index) => SpinnerSliver(
@@ -72,6 +77,78 @@ class DemoGliderScreen extends StatelessWidget {
                     height: 300,
                   ),
                 ),
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
+}
+
+class DemoLeafingScreen extends StatefulWidget {
+  final String shaderName;
+
+  const DemoLeafingScreen({super.key, required this.shaderName});
+
+  @override
+  State<DemoLeafingScreen> createState() => _DemoLeafingScreenState();
+}
+
+class _DemoLeafingScreenState extends State<DemoLeafingScreen> {
+  /// Init shader.
+  late final Future<ui.FragmentShader?> _shaderFuture;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _shaderFuture =
+        ui.FragmentProgram.fromAsset('assets/shaders/${widget.shaderName}.frag')
+            .then<ui.FragmentShader?>((program) {
+      return program.fragmentShader();
+    }, onError: (e, __) {
+      debugPrint('Failed frag shader: $e');
+      return null;
+    }).then((shader) async {
+      if (shader != null) {
+        final byteData = await rootBundle.load('assets/textures/texture.png');
+        final list = Uint8List.view(byteData.buffer);
+        final image = await decodeImageFromList(list);
+        shader.setImageSampler(0, image);
+      }
+
+      return shader;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: _urls
+            .map(
+              (url) => FutureBuilder<ui.FragmentShader?>(
+                initialData: null,
+                future: _shaderFuture,
+                builder: (context, snapshot) {
+                  final shader = snapshot.data;
+
+                  if (shader == null) {
+                    return const SliverToBoxAdapter(child: SizedBox.shrink());
+                  }
+
+                  return LeafingSliver(
+                    shader: shader,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.network(
+                        url,
+                        fit: BoxFit.cover,
+                        height: 300,
+                      ),
+                    ),
+                  );
+                },
               ),
             )
             .toList(),

@@ -57,17 +57,23 @@ final class GliderRenderSliver extends LeavingTransformRenderSliver {
         break;
     }
 
-    final dx = childCrossExtent * leavingProgress;
-    final translation = dx * (exitSide == GliderExitSide.left ? -1 : 1);
+    final shifting = childCrossExtent * leavingProgress;
+    final translation = shifting * (exitSide == GliderExitSide.left ? -1 : 1);
+
+    if (constraints.axis == Axis.horizontal) {
+      return Matrix4.identity()..translate(.0, -translation);
+    }
+
     return Matrix4.identity()..translate(translation);
   }
 }
 
-/// Describes the side to which widget is moving out.
+/// Describes the side to which widget is moving out relative the
+/// main axis of viewport.
 enum GliderExitSide {
-  /// From right to left.
+  /// From the right to the left.
   left,
 
-  /// From left to right.
+  /// From the left to the right.
   right,
 }
