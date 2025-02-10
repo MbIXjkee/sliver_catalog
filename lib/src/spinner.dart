@@ -1,21 +1,16 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:sliver_catalog/src/base/leaving_transform_render_sliver.dart';
+import 'package:sliver_catalog/src/base/leaving_viewport_transform_render_sliver.dart';
 
 const double _kQuarterTurnsInRadians = math.pi / 2.0;
 
 /// The sliver widget that rotates around one of the latest side corners
 /// while moving out from the screen.
-/// The widget doesn't have its own size, and all calculations are based on the
-/// child dimensions.
+/// 
 /// When the last part of this widget leaves the screen, it is rotated to
 /// [maxAngle] radians around the anchor point.
 /// Before this moment, rotation is proportional to the part of the widget that
 /// has already left the screen.
-/// If the size of the widget is bigger than the available viewport size,
-/// the rotation starts as soon as the anchor point appears in the visible
-/// part of the viewport, and the calculations of the rotation are based on the
-/// size of the visible part of the viewport.
 class SpinnerSliver extends SingleChildRenderObjectWidget {
   /// The side of the rotation point.
   final SpinnerAnchorSide anchorSide;
@@ -47,7 +42,7 @@ class SpinnerSliver extends SingleChildRenderObjectWidget {
   }
 }
 
-final class SpinnerRenderSliver extends LeavingTransformRenderSliver {
+final class SpinnerRenderSliver extends LeavingViewportTransformedRenderSliver {
   SpinnerAnchorSide _anchorSide;
   double _maxAngle;
 

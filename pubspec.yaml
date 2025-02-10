@@ -17,5 +17,3 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mjk_lint_rules: ^3.0.1
-
-flutter:

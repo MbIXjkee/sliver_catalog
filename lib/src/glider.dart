@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:sliver_catalog/src/base/leaving_transform_render_sliver.dart';
+import 'package:sliver_catalog/src/base/leaving_viewport_transform_render_sliver.dart';
 
-/// The sliver widget that slipping left or right while moving out
-/// from the screen. Widget has no own sizes, and bases all calculations on the
-/// child dimensions.
+/// The sliver widget that slides left or right while moving out
+/// from the screen.
 class GliderSliver extends SingleChildRenderObjectWidget {
-  /// Describe the side to which widget is moving out.
+  /// The side to which the widget is moving out relative to the main axis of
+  /// the viewport.
   final GliderExitSide exitSide;
 
   /// Creates an instance of [GliderSliver].
@@ -29,7 +29,7 @@ class GliderSliver extends SingleChildRenderObjectWidget {
   }
 }
 
-final class GliderRenderSliver extends LeavingTransformRenderSliver {
+final class GliderRenderSliver extends LeavingViewportTransformedRenderSliver {
   GliderExitSide _exitSide;
 
   GliderExitSide get exitSide => _exitSide;
@@ -68,8 +68,8 @@ final class GliderRenderSliver extends LeavingTransformRenderSliver {
   }
 }
 
-/// Describes the side to which widget is moving out relative the
-/// main axis of viewport.
+/// Describes possible values for the side to which the content is moving out
+/// relative to the main axis of the viewport.
 enum GliderExitSide {
   /// From the right to the left.
   left,

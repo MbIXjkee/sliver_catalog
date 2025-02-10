@@ -2,14 +2,20 @@ import 'dart:math' as math;
 
 import 'package:flutter/rendering.dart';
 
-/// Base implementation of the sliver that performs transformation
-/// during the leaving the screen.
-/// The size of this render object is based on the child size.
-/// If size is bigger than the viewport size, transformation starts as
-/// soon the latest part apears in the visible part of the viewport, and the 
-/// calculation of the progress based on the size of the visible part of the
-/// viewport.
-abstract class LeavingTransformRenderSliver
+/// A base implementation of the sliver that performs a transformation
+/// during the leaving of the visual part of the viewport.
+///
+/// Transformation is defined by the function [performTransform].
+///
+/// The size of this render object is based on the child size. And the progress
+/// of the transformation is calculated based on the visible part of this object
+/// compared to the whole size of the object.
+///
+/// If the size is bigger than the viewport size, the transformation starts as
+/// soon as the latest part appears in the visible part of the viewport, and the
+/// calculation of the progress is based on the size of the visible part of the
+/// object compared to the viewport size.
+abstract class LeavingViewportTransformedRenderSliver
     extends RenderSliverSingleBoxAdapter {
   final _transformLayer = LayerHandle<TransformLayer>();
   Matrix4? _paintTransform;
