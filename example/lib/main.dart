@@ -19,8 +19,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      // home: const DemoLeafingScreen(shaderName: 'freezing'),
-      home: const DemoSpinnerScreen(),
+      home: const DemoShaderScreen(shaderName: 'freezing'),
+      // home: const DemoSpinnerScreen(),
+      // home: const DemoGliderScreen(),
     );
   }
 }
@@ -85,16 +86,16 @@ class DemoGliderScreen extends StatelessWidget {
   }
 }
 
-class DemoLeafingScreen extends StatefulWidget {
+class DemoShaderScreen extends StatefulWidget {
   final String shaderName;
 
-  const DemoLeafingScreen({super.key, required this.shaderName});
+  const DemoShaderScreen({super.key, required this.shaderName});
 
   @override
-  State<DemoLeafingScreen> createState() => _DemoLeafingScreenState();
+  State<DemoShaderScreen> createState() => _DemoShaderScreenState();
 }
 
-class _DemoLeafingScreenState extends State<DemoLeafingScreen> {
+class _DemoShaderScreenState extends State<DemoShaderScreen> {
   /// Init shader.
   late final Future<ui.FragmentShader?> _shaderFuture;
 
@@ -137,7 +138,7 @@ class _DemoLeafingScreenState extends State<DemoLeafingScreen> {
                     return const SliverToBoxAdapter(child: SizedBox.shrink());
                   }
 
-                  return LeafingSliver(
+                  return LeavingViewportShaderSliver(
                     shader: shader,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),

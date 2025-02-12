@@ -121,7 +121,6 @@ final class SpinnerRenderSliver extends LeavingViewportTransformedRenderSliver {
   }
 }
 
-// TODO: описать норм.
 /// Defines the side of the anchor relative the main axis of the viewport.
 enum SpinnerAnchorSide {
   /// Anchor at the left side.

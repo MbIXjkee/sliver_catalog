@@ -3,12 +3,18 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-///
-class LeafingSliver extends SingleChildRenderObjectWidget {
+/// A base implementation of the sliver that applies a [shader]
+/// during the leaving of the visual part of the viewport.
+/// 
+/// Shader is a [ui.FragmentShader] which should operate with
+/// the following params:
+// TODO(mjk): describe shader params.
+class LeavingViewportShaderSliver extends SingleChildRenderObjectWidget {
+  /// The shader to apply.
   final ui.FragmentShader shader;
 
-  /// Creates an instance of [LeafingSliver].
-  const LeafingSliver({
+  /// Creates an instance of [LeavingViewportShaderSliver].
+  const LeavingViewportShaderSliver({
     super.key,
     required Widget super.child,
     required this.shader,
@@ -16,19 +22,19 @@ class LeafingSliver extends SingleChildRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return LeafingRenderSliver(shader: shader);
+    return LeavingViewportShaderRenderSliver(shader: shader);
   }
 
   @override
   void updateRenderObject(
     BuildContext context,
-    LeafingRenderSliver renderObject,
+    LeavingViewportShaderRenderSliver renderObject,
   ) {
     renderObject.shader = shader;
   }
 }
 
-final class LeafingRenderSliver extends RenderSliver
+final class LeavingViewportShaderRenderSliver extends RenderSliver
     with RenderObjectWithChildMixin<RenderBox> {
   ui.FragmentShader _shader;
   double _progress = 0;
@@ -42,7 +48,7 @@ final class LeafingRenderSliver extends RenderSliver
     markNeedsPaint();
   }
 
-  LeafingRenderSliver({
+  LeavingViewportShaderRenderSliver({
     required ui.FragmentShader shader,
   }) : _shader = shader;
 
