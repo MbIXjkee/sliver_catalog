@@ -5,7 +5,7 @@ import 'package:flutter/rendering.dart';
 
 /// A base implementation of the sliver that applies a [shader]
 /// during the leaving of the visual part of the viewport.
-/// 
+///
 /// Shader is a [ui.FragmentShader] which should operate with
 /// the following params:
 // TODO(mjk): describe shader params.
@@ -112,7 +112,23 @@ final class LeavingViewportShaderRenderSliver extends RenderSliver
     if (child != null && geometry!.visible) {
       final childParentData = child!.parentData! as SliverPhysicalParentData;
       final paintChildOffset = offset + childParentData.paintOffset;
-      context.paintChild(child!, paintChildOffset);
+      // context.paintChild(child!, paintChildOffset);
+
+      final pictureRecorder = ui.PictureRecorder();
+      final canvas = Canvas(pictureRecorder);
+
+      final fakePaintContext = PaintingContext(
+        ContainerLayer(),
+        context.estimatedBounds,
+      );
+
+      fakePaintContext.paintChild(child!, paintChildOffset);
+
+      final picture = pictureRecorder.endRecording();
+      final image = picture.toImageSync(
+        child!.size.width.toInt(),
+        child!.size.height.toInt(),
+      );
 
       if (_progress > 0) {
         final childSize = child!.size;
