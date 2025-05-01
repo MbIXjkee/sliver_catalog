@@ -3,12 +3,13 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sliver_catalog/sliver_catalog.dart';
+import 'package:sliver_catalog_example/common/indexed_iterable.dart';
+import 'package:sliver_catalog_example/common/image_urls.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-/// App widget.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -35,7 +36,7 @@ class DemoSpinnerScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         reverse: true,
-        slivers: _urls
+        slivers: urls
             .mapIndexed(
               (url, index) => SpinnerSliver(
                 anchorSide: index.isOdd
@@ -65,7 +66,7 @@ class DemoGliderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
-        slivers: _urls
+        slivers: urls
             .mapIndexed(
               (url, index) => GliderSliver(
                 exitSide:
@@ -126,7 +127,7 @@ class _DemoShaderScreenState extends State<DemoShaderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
-        slivers: _urls
+        slivers: urls
             .map(
               (url) => FutureBuilder<ui.FragmentShader?>(
                 initialData: null,
@@ -152,27 +153,5 @@ class _DemoShaderScreenState extends State<DemoShaderScreen> {
             .toList(),
       ),
     );
-  }
-}
-
-const _urls = <String>[
-  'https://www.stockvault.net/data/2018/12/30/258501/preview16.jpg',
-  'https://www.stockvault.net/data/2010/10/01/115175/preview16.jpg',
-  'https://www.stockvault.net/data/2011/04/18/122242/preview16.jpg',
-  'https://www.stockvault.net/data/2014/03/26/155336/preview16.jpg',
-  'https://www.stockvault.net/data/2018/12/30/258501/preview16.jpg',
-  'https://www.stockvault.net/data/2010/10/01/115175/preview16.jpg',
-  'https://www.stockvault.net/data/2011/04/18/122242/preview16.jpg',
-  'https://www.stockvault.net/data/2014/03/26/155336/preview16.jpg',
-  'https://www.stockvault.net/data/2018/12/30/258501/preview16.jpg',
-  'https://www.stockvault.net/data/2010/10/01/115175/preview16.jpg',
-  'https://www.stockvault.net/data/2011/04/18/122242/preview16.jpg',
-  'https://www.stockvault.net/data/2014/03/26/155336/preview16.jpg',
-];
-
-extension _IndexedIterable<E> on Iterable<E> {
-  Iterable<T> mapIndexed<T>(T Function(E e, int i) f) {
-    var i = 0;
-    return map((e) => f(e, i++));
   }
 }
