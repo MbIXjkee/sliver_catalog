@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const DemoShaderScreen(shaderName: 'freezing3'),
+      home: const DemoShaderScreen(shaderName: 'freezing'),
       // home: const DemoSpinnerScreen(),
       // home: const DemoGliderScreen(),
     );
