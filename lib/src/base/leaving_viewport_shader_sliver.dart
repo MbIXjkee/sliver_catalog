@@ -3,14 +3,16 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-/// A base implementation of the sliver that applies a [shader]
-/// during the leaving of the visual part of the viewport.
+/// A base implementation of the sliver that applies a [shader] on top of the
+/// child during the leaving of the visual part of the viewport.
 ///
 /// Shader is a [ui.FragmentShader] which should operate with
 /// the following params:
-// TODO(mjk): describe shader params.
+/// uniform vec2 uSize - size of the child;
+/// uniform vec2 uOffset - offset of the child in canvas;
+/// uniform float uProgress - leaving progress;
 class LeavingViewportShaderSliver extends SingleChildRenderObjectWidget {
-  /// The shader to apply.
+  /// The shader to apply to the child.
   final ui.FragmentShader? shader;
 
   /// Creates an instance of [LeavingViewportShaderSliver].
