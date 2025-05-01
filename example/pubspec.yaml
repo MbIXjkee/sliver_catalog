@@ -22,5 +22,7 @@ flutter:
   uses-material-design: true
   shaders:
     - assets/shaders/freezing.frag
+    - assets/shaders/freezing2.frag
+    - assets/shaders/freezing3.frag
   assets:
     - assets/textures/

@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const DemoShaderScreen(shaderName: 'freezing'),
+      home: const DemoShaderScreen(shaderName: 'freezing3'),
       // home: const DemoSpinnerScreen(),
       // home: const DemoGliderScreen(),
     );
@@ -140,13 +140,10 @@ class _DemoShaderScreenState extends State<DemoShaderScreen> {
 
                   return LeavingViewportShaderSliver(
                     shader: shader,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Image.network(
-                        url,
-                        fit: BoxFit.cover,
-                        height: 300,
-                      ),
+                    child: Image.network(
+                      url,
+                      fit: BoxFit.cover,
+                      height: 300,
                     ),
                   );
                 },

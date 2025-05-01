@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -114,10 +113,7 @@ final class LeavingViewportShaderRenderSliver extends RenderSliver
       final childParentData = child!.parentData! as SliverPhysicalParentData;
       final paintChildOffset = offset + childParentData.paintOffset;
 
-      final fakeLayer = OffsetLayer();
-      context
-        ..addLayer(fakeLayer)
-        ..paintChild(child!, paintChildOffset);
+      context.paintChild(child!, paintChildOffset);
 
       if (_progress > 0) {
         final childSize = child!.size;
@@ -127,21 +123,14 @@ final class LeavingViewportShaderRenderSliver extends RenderSliver
           childSize.width,
           childSize.height,
         );
-        final image = fakeLayer.toImageSync(Rect.fromLTWH(
-          0,
-          0,
-          childSize.width,
-          childSize.height,
-        ));
-        image.toByteData().then((b) {
-          
-        });
+
         final paint = Paint()
           ..shader = (shader
-            ..setFloat(0, rect.width)
-            ..setFloat(1, rect.height)
-            ..setFloat(2, 1 - _progress)
-            ..setImageSampler(1, image));
+            ..setFloat(0, childSize.width)
+            ..setFloat(1, childSize.height)
+            ..setFloat(2, paintChildOffset.dx)
+            ..setFloat(3, paintChildOffset.dy)
+            ..setFloat(4, 1 - _progress));
         context.canvas.drawRect(rect, paint);
       }
     }
