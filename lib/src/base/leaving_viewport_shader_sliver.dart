@@ -11,7 +11,7 @@ import 'package:flutter/rendering.dart';
 // TODO(mjk): describe shader params.
 class LeavingViewportShaderSliver extends SingleChildRenderObjectWidget {
   /// The shader to apply.
-  final ui.FragmentShader shader;
+  final ui.FragmentShader? shader;
 
   /// Creates an instance of [LeavingViewportShaderSliver].
   const LeavingViewportShaderSliver({
@@ -36,11 +36,11 @@ class LeavingViewportShaderSliver extends SingleChildRenderObjectWidget {
 
 final class LeavingViewportShaderRenderSliver extends RenderSliver
     with RenderObjectWithChildMixin<RenderBox> {
-  ui.FragmentShader _shader;
+  ui.FragmentShader? _shader;
   double _progress = 0;
 
-  ui.FragmentShader get shader => _shader;
-  set shader(ui.FragmentShader value) {
+  ui.FragmentShader? get shader => _shader;
+  set shader(ui.FragmentShader? value) {
     if (_shader == value) {
       return;
     }
@@ -49,7 +49,7 @@ final class LeavingViewportShaderRenderSliver extends RenderSliver
   }
 
   LeavingViewportShaderRenderSliver({
-    required ui.FragmentShader shader,
+    required ui.FragmentShader? shader,
   }) : _shader = shader;
 
   @override
@@ -114,8 +114,9 @@ final class LeavingViewportShaderRenderSliver extends RenderSliver
       final paintChildOffset = offset + childParentData.paintOffset;
 
       context.paintChild(child!, paintChildOffset);
+      final tunedShader = shader;
 
-      if (_progress > 0) {
+      if (tunedShader != null && _progress > 0) {
         final childSize = child!.size;
         final rect = Rect.fromLTWH(
           paintChildOffset.dx,
@@ -124,13 +125,14 @@ final class LeavingViewportShaderRenderSliver extends RenderSliver
           childSize.height,
         );
 
-        final paint = Paint()
-          ..shader = (shader
-            ..setFloat(0, childSize.width)
-            ..setFloat(1, childSize.height)
-            ..setFloat(2, paintChildOffset.dx)
-            ..setFloat(3, paintChildOffset.dy)
-            ..setFloat(4, 1 - _progress));
+        tunedShader
+          ..setFloat(0, childSize.width)
+          ..setFloat(1, childSize.height)
+          ..setFloat(2, paintChildOffset.dx)
+          ..setFloat(3, paintChildOffset.dy)
+          ..setFloat(4, 1 - _progress);
+
+        final paint = Paint()..shader = tunedShader;
         context.canvas.drawRect(rect, paint);
       }
     }
