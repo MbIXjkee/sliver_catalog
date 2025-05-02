@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
 /// A base implementation of the sliver that performs a transformation
@@ -20,7 +21,21 @@ abstract class LeavingViewportTransformedRenderSliver
   final _transformLayer = LayerHandle<TransformLayer>();
   Matrix4? _paintTransform;
 
+  @protected
+  Matrix4? get paintTransform => _paintTransform;
+
+  /// A function that defines the transformation applied to the child.
   Matrix4? performTransform(Size childSize, double leavingProgress);
+
+  /// Function that allows inheritance to define a special behavior of the
+  /// hit test.
+  /// Null by default means there is no hit test override.
+  bool? performHitTest({
+    required double mainAxisPosition,
+    required double crossAxisPosition,
+  }) {
+    return null;
+  }
 
   @override
   void performLayout() {
@@ -98,6 +113,82 @@ abstract class LeavingViewportTransformedRenderSliver
     }
 
     super.applyPaintTransform(child, transform);
+  }
+
+  @override
+  bool hitTest(
+    SliverHitTestResult result, {
+    required double mainAxisPosition,
+    required double crossAxisPosition,
+  }) {
+    // Check if hit test is overridden.
+    final overrideHaveHit = performHitTest(
+      mainAxisPosition: mainAxisPosition,
+      crossAxisPosition: crossAxisPosition,
+    );
+
+    if (overrideHaveHit == null) {
+      // Follow the default hit test behavior for the sliver.
+      final transform = _paintTransform ?? Matrix4.identity();
+      final inverse = Matrix4.tryInvert(transform);
+      if (inverse == null) {
+        // Matrix is not invertible, so we can't perform hit test.
+        return false;
+      }
+
+      // Calculate the raw offset based on the main and cross axis positions.
+      final rawOffset = constraints.axis == Axis.horizontal
+          ? Offset(mainAxisPosition, crossAxisPosition)
+          : Offset(crossAxisPosition, mainAxisPosition);
+
+      final localOffset = MatrixUtils.transformPoint(inverse, rawOffset);
+
+      // Calculate the adjusted main and cross axis positions to provide to the
+      // child for checking hit test.
+      final adjustedMain =
+          constraints.axis == Axis.horizontal ? localOffset.dx : localOffset.dy;
+      final adjustedCross =
+          constraints.axis == Axis.horizontal ? localOffset.dy : localOffset.dx;
+
+      var haveHit = hitTestChildren(
+        result,
+        mainAxisPosition: adjustedMain,
+        crossAxisPosition: adjustedCross,
+      );
+
+      if (!haveHit) {
+        // If the hit test didn't hit any children, we can check if the sliver
+        // itself has hit, which is unlikely to happen since it is just a
+        // container for transforming the child.
+        haveHit = hitTestSelf(
+          mainAxisPosition: mainAxisPosition,
+          crossAxisPosition: crossAxisPosition,
+        );
+      }
+
+      if (haveHit) {
+        result.add(
+          SliverHitTestEntry(
+            this,
+            mainAxisPosition: mainAxisPosition,
+            crossAxisPosition: crossAxisPosition,
+          ),
+        );
+        return true;
+      }
+    } else if (overrideHaveHit) {
+      // Rely on information from the override.
+      result.add(
+        SliverHitTestEntry(
+          this,
+          mainAxisPosition: mainAxisPosition,
+          crossAxisPosition: crossAxisPosition,
+        ),
+      );
+      return true;
+    }
+
+    return false;
   }
 
   @override
