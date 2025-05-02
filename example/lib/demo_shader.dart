@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sliver_catalog/sliver_catalog.dart';
 import 'package:sliver_catalog_example/common/image_urls.dart';
+import 'package:sliver_catalog_example/common/content_example.dart';
 
 void main() {
   runApp(const MyApp());
@@ -58,23 +59,8 @@ class _DemoShaderScreenState extends State<DemoShaderScreen> {
 
                   return LeavingViewportShaderSliver(
                     shader: shader,
-                    child: Stack(
-                      children: [
-                        Image.network(
-                          url,
-                          fit: BoxFit.cover,
-                          height: 300,
-                          width: double.infinity,
-                        ),
-                        Positioned.fill(
-                          child: Center(
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              child: const Text('Click Me'),
-                            ),
-                          ),
-                        ),
-                      ],
+                    child: ContentExample(
+                      url: url,
                     ),
                   );
                 },

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sliver_catalog/sliver_catalog.dart';
+import 'package:sliver_catalog_example/common/content_example.dart';
 import 'package:sliver_catalog_example/common/image_urls.dart';
 import 'package:sliver_catalog_example/common/indexed_iterable.dart';
 
@@ -38,11 +39,7 @@ class DemoSpinnerScreen extends StatelessWidget {
                     : SpinnerAnchorSide.right,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: Image.network(
-                    url,
-                    fit: BoxFit.cover,
-                    height: 300,
-                  ),
+                  child: ContentExample(url: url),
                 ),
               ),
             )
