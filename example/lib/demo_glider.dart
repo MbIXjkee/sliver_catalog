@@ -36,10 +36,23 @@ class DemoGliderScreen extends StatelessWidget {
                     index.isOdd ? GliderExitSide.left : GliderExitSide.right,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: Image.network(
-                    url,
-                    fit: BoxFit.cover,
-                    height: 300,
+                  child: Stack(
+                    children: [
+                      Image.network(
+                        url,
+                        fit: BoxFit.cover,
+                        height: 300,
+                        width: double.infinity,
+                      ),
+                      Positioned.fill(
+                        child: Center(
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            child: const Text('Click Me'),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
