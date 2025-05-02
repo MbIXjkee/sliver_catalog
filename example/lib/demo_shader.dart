@@ -58,10 +58,23 @@ class _DemoShaderScreenState extends State<DemoShaderScreen> {
 
                   return LeavingViewportShaderSliver(
                     shader: shader,
-                    child: Image.network(
-                      url,
-                      fit: BoxFit.cover,
-                      height: 300,
+                    child: Stack(
+                      children: [
+                        Image.network(
+                          url,
+                          fit: BoxFit.cover,
+                          height: 300,
+                          width: double.infinity,
+                        ),
+                        Positioned.fill(
+                          child: Center(
+                            child: ElevatedButton(
+                              onPressed: () {},
+                              child: const Text('Click Me'),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 },
