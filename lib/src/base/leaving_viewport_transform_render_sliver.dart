@@ -113,20 +113,16 @@ abstract class LeavingViewportTransformedRenderSliver
   }) {
     assert(geometry!.hitTestExtent > 0.0);
     if (child != null) {
-      // Например, если у тебя есть матрица трансформации:
       final transform = _paintTransform ?? Matrix4.identity();
 
-      // Инвертируем
       final inverse = Matrix4.tryInvert(transform);
       if (inverse == null) return false;
 
-      // Преобразуем точку
       final localOffset = MatrixUtils.transformPoint(
         inverse,
         Offset(crossAxisPosition, mainAxisPosition),
       );
 
-      // Используем преобразованные координаты
       return hitTestBoxChild(
         BoxHitTestResult.wrap(result),
         child!,
