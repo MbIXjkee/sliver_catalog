@@ -27,6 +27,18 @@ abstract class LeavingViewportTransformedRenderSliver
   /// A function that defines the transformation applied to the child.
   Matrix4? performTransform(Size childSize, double leavingProgress);
 
+  /// A function that applies a hit test to the child in specific
+  /// way, which is different from the default one.
+  /// 
+  /// When this function returns null, the default hit test should be applied.
+  bool? performSpecificHitTestChildren(
+    SliverHitTestResult result, {
+    required double mainAxisPosition,
+    required double crossAxisPosition,
+  }) {
+    return null;
+  }
+
   @override
   void performLayout() {
     _paintTransform = null;
