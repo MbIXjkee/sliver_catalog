@@ -1,12 +1,13 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:sliver_catalog/src/base/leaving_viewport_transform_render_sliver.dart';
 
 const double _kQuarterTurnsInRadians = math.pi / 2.0;
 
 /// The sliver widget that rotates around one of the latest side corners
 /// while moving out from the screen.
-/// 
+///
 /// When the last part of this widget leaves the screen, it is rotated to
 /// [maxAngle] radians around the anchor point.
 /// Before this moment, rotation is proportional to the part of the widget that
@@ -97,6 +98,37 @@ final class SpinnerRenderSliver extends LeavingViewportTransformedRenderSliver {
       ..translate(translation.dx, translation.dy)
       ..rotateZ(_isReversed ? -rotation : rotation)
       ..translate(-translation.dx, -translation.dy);
+  }
+
+  @override
+  bool performSpecificHitTestChildren(
+    SliverHitTestResult result, {
+    required double mainAxisPosition,
+    required double crossAxisPosition,
+  }) {
+    assert(geometry!.hitTestExtent > 0.0);
+    if (child != null) {
+      // Since we deal with the rotation, the default inverse doesn't work as
+      // expected for reversed scrolling.
+      // Rotation is based on the top left corner by default, which is match
+      // with 0:0 in direct case. But for reverse case, the 0:0 point is
+      // left bottom corner, and main and cross axis position is calculated
+      // from that point. Rotation is still based on the top left cornerr.
+      // To calculate hit test correctly we'll covert the main axis position
+      // to be calculated from the top left corner always.
+      final correctedMainOffset = _isReversed
+          ? geometry!.paintExtent - mainAxisPosition
+          : mainAxisPosition;
+
+      return BoxHitTestResult.wrap(result).addWithPaintTransform(
+        transform: paintTransform,
+        position: Offset(crossAxisPosition, correctedMainOffset),
+        hitTest: (result, position) {
+          return child!.hitTest(result, position: position);
+        },
+      );
+    }
+    return false;
   }
 
   Offset _calculateTranslation(Size size) {
