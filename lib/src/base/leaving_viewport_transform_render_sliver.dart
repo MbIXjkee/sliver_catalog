@@ -29,7 +29,9 @@ abstract class LeavingViewportTransformedRenderSliver
 
   /// A function that applies a hit test to the child in specific
   /// way, which is different from the default one.
-  /// 
+  /// The default hit test for this sliver is using the inverse of the 
+  /// transformation matrix. 
+  ///
   /// When this function returns null, the default hit test should be applied.
   bool? performSpecificHitTestChildren(
     SliverHitTestResult result, {
@@ -124,24 +126,38 @@ abstract class LeavingViewportTransformedRenderSliver
     required double crossAxisPosition,
   }) {
     assert(geometry!.hitTestExtent > 0.0);
-    if (child != null) {
-      final transform = _paintTransform ?? Matrix4.identity();
 
-      final inverse = Matrix4.tryInvert(transform);
-      if (inverse == null) return false;
+    final specificHitTestResult = performSpecificHitTestChildren(
+      result,
+      mainAxisPosition: mainAxisPosition,
+      crossAxisPosition: crossAxisPosition,
+    );
 
-      final localOffset = MatrixUtils.transformPoint(
-        inverse,
-        Offset(crossAxisPosition, mainAxisPosition),
-      );
+    if (specificHitTestResult == null) {
+      if (child != null) {
+        final transform = _paintTransform ?? Matrix4.identity();
 
-      return hitTestBoxChild(
-        BoxHitTestResult.wrap(result),
-        child!,
-        mainAxisPosition: localOffset.dy,
-        crossAxisPosition: localOffset.dx,
-      );
+        final inverse = Matrix4.tryInvert(transform);
+        if (inverse == null) return false;
+
+        final localOffset = MatrixUtils.transformPoint(
+          inverse,
+          Offset(crossAxisPosition, mainAxisPosition),
+        );
+
+        return hitTestBoxChild(
+          BoxHitTestResult.wrap(result),
+          child!,
+          mainAxisPosition: localOffset.dy,
+          crossAxisPosition: localOffset.dx,
+        );
+      }
+    } else {
+      if (specificHitTestResult) {
+        return true;
+      }
     }
+
     return false;
   }
 
