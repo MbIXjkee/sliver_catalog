@@ -29,8 +29,8 @@ abstract class LeavingViewportTransformedRenderSliver
 
   /// A function that applies a hit test to the child in specific
   /// way, which is different from the default one.
-  /// The default hit test for this sliver is using the inverse of the 
-  /// transformation matrix. 
+  /// The default hit test for this sliver is using the inverse of the
+  /// transformation matrix.
   ///
   /// When this function returns null, the default hit test should be applied.
   bool? performSpecificHitTestChildren(
@@ -127,35 +127,36 @@ abstract class LeavingViewportTransformedRenderSliver
   }) {
     assert(geometry!.hitTestExtent > 0.0);
 
+    // Check if there is a specific hit test implementation.
     final specificHitTestResult = performSpecificHitTestChildren(
       result,
       mainAxisPosition: mainAxisPosition,
       crossAxisPosition: crossAxisPosition,
     );
 
-    if (specificHitTestResult == null) {
-      if (child != null) {
-        final transform = _paintTransform ?? Matrix4.identity();
+    if (specificHitTestResult != null) {
+      // Rely on the specific hit test implementation.
+      return specificHitTestResult;
+    }
 
-        final inverse = Matrix4.tryInvert(transform);
-        if (inverse == null) return false;
+    // Fall back to the default hit test implementation.
+    if (child != null) {
+      final transform = _paintTransform ?? Matrix4.identity();
 
-        final localOffset = MatrixUtils.transformPoint(
-          inverse,
-          Offset(crossAxisPosition, mainAxisPosition),
-        );
+      final inverse = Matrix4.tryInvert(transform);
+      if (inverse == null) return false;
 
-        return hitTestBoxChild(
-          BoxHitTestResult.wrap(result),
-          child!,
-          mainAxisPosition: localOffset.dy,
-          crossAxisPosition: localOffset.dx,
-        );
-      }
-    } else {
-      if (specificHitTestResult) {
-        return true;
-      }
+      final localOffset = MatrixUtils.transformPoint(
+        inverse,
+        Offset(crossAxisPosition, mainAxisPosition),
+      );
+
+      return hitTestBoxChild(
+        BoxHitTestResult.wrap(result),
+        child!,
+        mainAxisPosition: localOffset.dy,
+        crossAxisPosition: localOffset.dx,
+      );
     }
 
     return false;
