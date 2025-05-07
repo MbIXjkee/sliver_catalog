@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:sliver_catalog/sliver_catalog.dart';
 import 'package:sliver_catalog_example/common/image_urls.dart';
 import 'package:sliver_catalog_example/common/content_example.dart';
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const DemoShaderScreen(shaderName: 'freezing'),
+      home: const DemoShaderScreen(shaderName: 'custom'),
     );
   }
 }
@@ -77,10 +76,6 @@ class _DemoShaderScreenState extends State<DemoShaderScreen> {
         'assets/shaders/${widget.shaderName}.frag',
       );
       final shader = program.fragmentShader();
-      final byteData = await rootBundle.load('assets/textures/texture.png');
-      final list = Uint8List.view(byteData.buffer);
-      final image = await decodeImageFromList(list);
-      shader.setImageSampler(0, image);
 
       return shader;
     } catch (e) {
