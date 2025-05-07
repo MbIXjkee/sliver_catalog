@@ -17,3 +17,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   mjk_lint_rules: ^3.0.1
+
+flutter:
+  shaders:
+    - assets/shaders/freezing.frag
+  assets:
+    - assets/textures/
