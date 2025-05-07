@@ -3,7 +3,7 @@
 
 uniform vec2 uSize;      // размер спрайта
 uniform vec2 uOffset;    // смещение в канвасе
-uniform float uProgress;  // [0.0 — на экране, 1.0 — почти ушёл]
+uniform float uProgress; // [0.0 — на экране, 1.0 — почти ушёл]
 
 out vec4 fragColor;
 
@@ -43,13 +43,13 @@ void main() {
     // p = 0…1 заполнение (инверсия прогресса)
     float p = 1.0 - uProgress;
 
-    // плавное появление волны первые 10% p
+    // волна плавно появляется первые 10% p
     float waveAppear = smoothstep(0.0, 0.1, p);
     float rawWave = 0.02 * sin(uv.x * 30.0) + 0.015 * fbm(vec2(uv.x * 8.0, p * 5.0));
     rawWave = max(rawWave, 0.0);
     float threshold = clamp(p + rawWave * waveAppear, 0.0, 1.0);
 
-    // параметры капель
+    // капли
     const float DROP_SEGMENTS = 20.0;
     const float NO_DROP_RATIO = 0.3;
     float seg = floor(uv.x * DROP_SEGMENTS);
@@ -58,9 +58,12 @@ void main() {
     float normS = hasDrop ? (seed - NO_DROP_RATIO) / (1.0 - NO_DROP_RATIO) : 0.0;
     float dropSpeed = mix(0.1, 1.0, normS);
 
-    // форма и длина капли
-    float dropNoise = fbm(vec2(uv.x * 20.0, p * 10.0));
-    float dropLen = dropNoise * p * 0.5 * dropSpeed;
+    // статическая форма капли — хеш от сегмента
+    float dropNoise = hash(seg * 12.9898);
+
+    // длина капли: фазa появляется монотонно, шум статичен, p растёт
+    float dropPhase = hasDrop ? smoothstep(0.0, 1.0, p * dropSpeed) : 0.0;
+    float dropLen = dropPhase * dropNoise * p * 0.5;
     float finalT = clamp(threshold + dropLen, 0.0, 1.0);
 
     // сегментная геометрия
@@ -68,67 +71,56 @@ void main() {
     float radius = segW * 0.5;
     float cx = (seg + 0.5) * segW;
 
-    // проверяем, достигла ли капля нижней границы
+    // проверяем, достигла ли капля дна
     float eps = 1e-4;
     bool atBottom = finalT >= 1.0 - eps;
-
     vec3 bloodColor = vec3(0.6, 0.05, 0.05);
 
-    // обычная отрисовка до достижения дна
+    // отрисовка до дна
     if(!atBottom) {
-        // тело
         if(uv.y < threshold) {
+            // тело
             fragColor = vec4(bloodColor, 1.0);
-        }
-        // стебель капли
-        else if(hasDrop && uv.y < finalT - radius) {
+        } else if(hasDrop && uv.y < finalT - radius) {
+            // стебель
             fragColor = vec4(bloodColor, 1.0);
-        }
-        // округлая головка
-        else if(hasDrop) {
+        } else if(hasDrop) {
+            // округлая головка
             vec2 d = uv - vec2(cx, finalT - radius);
-            if(d.x * d.x + d.y * d.y <= radius * radius) {
+            if(dot(d, d) <= radius * radius) {
                 fragColor = vec4(bloodColor, 1.0);
-            } else {
+            } else
                 discard;
-            }
         } else {
             discard;
         }
     }
-    // когда капля упёрлась в дно — начинается растекание
+    // растекание по дну
     else {
-        // всё, что выше линии заполнения — обычная заливка
         if(uv.y < threshold) {
             fragColor = vec4(bloodColor, 1.0);
-        }
-        // переходная зона от головки к растеканию
-        else if(uv.y < finalT) {
-            // полукруглая головка, но обрезанная вполовину
+        } else if(uv.y < finalT) {
+            // переходная полукруглая и растекающая зона
             vec2 d = uv - vec2(cx, finalT - radius);
-            if(d.x * d.x + d.y * d.y <= radius * radius && uv.y < finalT - radius * 0.5) {
+            if(dot(d, d) <= radius * radius && uv.y < finalT - radius * 0.5) {
                 fragColor = vec4(bloodColor, 1.0);
             } else {
-                // начинаем растекаться уже в этой зоне
                 float mixY = (uv.y - (finalT - radius * 0.5)) / (radius * 1.5);
                 float spread = mix(radius, segW * 1.5, clamp(mixY, 0.0, 1.0));
                 if(abs(uv.x - cx) < spread) {
                     fragColor = vec4(bloodColor, 1.0);
-                } else {
+                } else
                     discard;
-                }
             }
-        }
-        // зона растекания по дну
-        else {
+        } else {
+            // зона окончательного растекания
             float spreadY = uv.y - finalT;
             float mixY = clamp(spreadY / (radius * 1.5), 0.0, 1.0);
             float spread = mix(radius, segW * 1.5, mixY);
             if(abs(uv.x - cx) < spread) {
                 fragColor = vec4(bloodColor, 1.0);
-            } else {
+            } else
                 discard;
-            }
         }
     }
 }
