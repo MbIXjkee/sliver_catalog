@@ -12,6 +12,10 @@ const double _kQuarterTurnsInRadians = math.pi / 2.0;
 /// [maxAngle] radians around the anchor point.
 /// Before this moment, rotation is proportional to the part of the widget that
 /// has already left the screen.
+/// 
+/// See also:
+/// [SingleChildRenderObjectWidget] a base class implements a transform applied
+/// to the child based on the progress of the leaving.
 class SpinnerSliver extends SingleChildRenderObjectWidget {
   /// The side of the rotation point.
   final SpinnerAnchorSide anchorSide;

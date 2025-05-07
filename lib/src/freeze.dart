@@ -4,6 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sliver_catalog/sliver_catalog.dart';
 
+/// A widget that freezes the content of a sliver using
+/// a predefined in the package shader effect.
+/// 
+/// See also:
+/// [LeavingViewportShaderSliver] a base for this sliver, that applies a passed
+/// shader to the child during the leaving of the visual part of the viewport.
 class FreezeSliver extends StatefulWidget {
   final Widget child;
 
