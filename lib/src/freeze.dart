@@ -6,7 +6,7 @@ import 'package:sliver_catalog/sliver_catalog.dart';
 
 /// A widget that freezes the content of a sliver using
 /// a predefined in the package shader effect.
-/// 
+///
 /// See also:
 /// [LeavingViewportShaderSliver] a base for this sliver, that applies a passed
 /// shader to the child during the leaving of the visual part of the viewport.
@@ -52,10 +52,11 @@ class _FreezeSliverState extends State<FreezeSliver> {
   Future<ui.FragmentShader?> _initShader() async {
     try {
       final program = await ui.FragmentProgram.fromAsset(
-        'assets/shaders/freezing.frag',
+        'packages/sliver_catalog/assets/shaders/freezing.frag',
       );
       final shader = program.fragmentShader();
-      final byteData = await rootBundle.load('assets/textures/texture.png');
+      final byteData = await rootBundle
+          .load('packages/sliver_catalog/assets/textures/texture.png');
       final list = Uint8List.view(byteData.buffer);
       final image = await decodeImageFromList(list);
       shader.setImageSampler(0, image);
