@@ -21,5 +21,6 @@ dev_dependencies:
 flutter:
   shaders:
     - assets/shaders/freezing.frag
+    - assets/shaders/blood.frag
   assets:
     - assets/textures/
