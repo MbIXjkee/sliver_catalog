@@ -3,7 +3,7 @@
 
 uniform vec2 uSize;         // Size of the child
 uniform vec2 uOffset;       // Offset of the child in canvas
-uniform float uProgress;    // leaving progress
+uniform float uProgress;    // Shader application progress from 0 (nothing) -> 1 (full)
 uniform sampler2D uFreezeTexture;
 
 out vec4 fragColor;
@@ -25,15 +25,15 @@ void main() {
     float mask = dot(freezeTex.rgb, vec3(0.299, 0.587, 0.114));
 
     // Freezing progress calculation.
-    float freezeStart = 1.0;
-    float freezeEnd = 0.3;
+    float freezeStart = 0.0;
+    float freezeEnd = 0.7;
+
     // The freezing effect is applied when the progress is between freezeStart and freezeEnd.
-    float normalized = clamp((freezeStart - uProgress) / (freezeStart - freezeEnd), 0.0, 1.0);
+    float normalized = clamp((uProgress - freezeStart) / (freezeEnd - freezeStart), 0.0, 1.0);
     // Add easing to the progress to apply a special dynamic to the effect.
-    float easedProgress = easeOutQuad(normalized);
     // Calculate the threshold for the freezing effect, for values higher than freezeThreshold,
     // the effect is not applied, for values lower than freezeThreshold, the effect is applied.
-    float freezeThreshold = mix(0.0, 1.0, easedProgress);
+    float freezeThreshold = easeOutQuad(normalized);
     float edgeWidth = 0.1;
 
     // Adding smothness to the effect.
