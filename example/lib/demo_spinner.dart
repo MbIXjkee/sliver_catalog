@@ -4,6 +4,7 @@ import 'package:sliver_catalog_example/common/content_example.dart';
 import 'package:sliver_catalog_example/common/image_urls.dart';
 import 'package:sliver_catalog_example/common/indexed_iterable.dart';
 
+/// An example of using the SpinnerSliver to demonstrate the spinning effect.
 void main() {
   runApp(const MyApp());
 }

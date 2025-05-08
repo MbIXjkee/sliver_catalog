@@ -3,6 +3,8 @@ import 'package:sliver_catalog/sliver_catalog.dart';
 import 'package:sliver_catalog_example/common/image_urls.dart';
 import 'package:sliver_catalog_example/common/content_example.dart';
 
+/// An example of using the BloodSliver widget to create a blood effect
+/// on the content.
 void main() {
   runApp(const MyApp());
 }

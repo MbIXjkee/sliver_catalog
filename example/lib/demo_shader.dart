@@ -6,6 +6,8 @@ import 'package:sliver_catalog/sliver_catalog.dart';
 import 'package:sliver_catalog_example/common/image_urls.dart';
 import 'package:sliver_catalog_example/common/content_example.dart';
 
+/// An example of using the LeavingViewportShaderSliver to apply a custom
+/// shader effect to the content.
 void main() {
   runApp(const MyApp());
 }
