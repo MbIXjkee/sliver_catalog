@@ -132,7 +132,7 @@ final class LeavingViewportShaderRenderSliver extends RenderSliver
           ..setFloat(1, childSize.height)
           ..setFloat(2, paintChildOffset.dx)
           ..setFloat(3, paintChildOffset.dy)
-          ..setFloat(4, 1 - _progress);
+          ..setFloat(4, _progress);
 
         final paint = Paint()..shader = tunedShader;
         context.canvas.drawRect(rect, paint);
