@@ -174,40 +174,28 @@ class _HijackRenderSliver extends RenderSliver
       constraints.growthDirection,
     );
 
-    final Offset paintOffset;
-    switch (actualGrowthDirection) {
-      case AxisDirection.up:
-        paintOffset = _isConsumingSpace
-            ? Offset.zero
-            : Offset(
-                0.0,
-                geometry.paintExtent +
-                    constraints.scrollOffset -
-                    geometry.scrollExtent,
-              );
-        break;
-      case AxisDirection.left:
-        paintOffset = _isConsumingSpace
-            ? Offset.zero
-            : Offset(
-                geometry.paintExtent +
-                    constraints.scrollOffset -
-                    geometry.scrollExtent,
-                0.0,
-              );
-        break;
-      case AxisDirection.right:
-        paintOffset = _isConsumingSpace
-            ? Offset.zero
-            : Offset(-_correctedScrollOffset, 0.0);
-        break;
-      case AxisDirection.down:
-        paintOffset = _isConsumingSpace
-            ? Offset.zero
-            : Offset(0.0, -_correctedScrollOffset);
-
-        break;
-    }
+    final paintOffset = switch (actualGrowthDirection) {
+      AxisDirection.up => _isConsumingSpace
+          ? Offset.zero
+          : Offset(
+              0.0,
+              geometry.paintExtent +
+                  constraints.scrollOffset -
+                  geometry.scrollExtent,
+            ),
+      AxisDirection.left => _isConsumingSpace
+          ? Offset.zero
+          : Offset(
+              geometry.paintExtent +
+                  constraints.scrollOffset -
+                  geometry.scrollExtent,
+              0.0,
+            ),
+      AxisDirection.right =>
+        _isConsumingSpace ? Offset.zero : Offset(-_correctedScrollOffset, 0.0),
+      AxisDirection.down =>
+        _isConsumingSpace ? Offset.zero : Offset(0.0, -_correctedScrollOffset),
+    };
 
     childParentData.paintOffset = paintOffset;
   }
