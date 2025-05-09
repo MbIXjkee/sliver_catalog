@@ -51,19 +51,68 @@ class _HijackSliver extends SingleChildRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return _HijackRenderSliver();
+    return _HijackRenderSliver(
+      consumingProgress: consumingSpaceSize,
+    );
   }
 
   @override
   void updateRenderObject(
     BuildContext context,
     _HijackRenderSliver renderObject,
-  ) {}
+  ) {
+    renderObject.consumingProgress = consumingSpaceSize;
+  }
 }
 
 class _HijackRenderSliver extends RenderSliverSingleBoxAdapter {
+  double _consumingProgress;
+
+  double get consumingProgress => _consumingProgress;
+  set consumingProgress(double value) {
+    if (_consumingProgress == value) {
+      return;
+    }
+    _consumingProgress = value;
+    markNeedsLayout();
+  }
+
+  _HijackRenderSliver({
+    required double consumingProgress,
+  }) : _consumingProgress = consumingProgress;
+
   @override
   void performLayout() {
-    
+    if (child == null) {
+      geometry = SliverGeometry.zero;
+      return;
+    }
+    final constraints = this.constraints;
+    child!.layout(constraints.asBoxConstraints(), parentUsesSize: true);
+    final childExtent = switch (constraints.axis) {
+      Axis.horizontal => child!.size.width,
+      Axis.vertical => child!.size.height,
+    };
+    // The scroll extent is the size of the child plus the amount of space
+    // this sliver consumes additionally.
+    final scrollExtent = childExtent + _consumingProgress;
+
+    final paintedChildSize =
+        calculatePaintOffset(constraints, from: 0.0, to: childExtent);
+    final cacheExtent =
+        calculateCacheOffset(constraints, from: 0.0, to: childExtent);
+
+    assert(paintedChildSize.isFinite);
+    assert(paintedChildSize >= 0.0);
+    geometry = SliverGeometry(
+      scrollExtent: scrollExtent,
+      paintExtent: paintedChildSize,
+      cacheExtent: cacheExtent,
+      maxPaintExtent: childExtent,
+      hitTestExtent: paintedChildSize,
+      hasVisualOverflow: childExtent > constraints.remainingPaintExtent ||
+          constraints.scrollOffset > 0.0,
+    );
+    setChildParentData(child!, constraints, geometry!);
   }
 }
