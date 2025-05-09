@@ -65,8 +65,14 @@ class _HijackSliver extends SingleChildRenderObjectWidget {
   }
 }
 
-class _HijackRenderSliver extends RenderSliverSingleBoxAdapter {
+class _HijackRenderSliver extends RenderSliver
+    with RenderObjectWithChildMixin<RenderBox>, RenderSliverHelpers {
   double _consumingProgress;
+
+  bool get _isConsumingSpace => constraints.scrollOffset <= _consumingProgress;
+
+  double get _correctedScrollOffset =>
+      constraints.scrollOffset - _consumingProgress;
 
   double get consumingProgress => _consumingProgress;
   set consumingProgress(double value) {
@@ -80,6 +86,13 @@ class _HijackRenderSliver extends RenderSliverSingleBoxAdapter {
   _HijackRenderSliver({
     required double consumingProgress,
   }) : _consumingProgress = consumingProgress;
+
+  @override
+  void setupParentData(RenderObject child) {
+    if (child.parentData is! SliverPhysicalParentData) {
+      child.parentData = SliverPhysicalParentData();
+    }
+  }
 
   @override
   void performLayout() {
@@ -97,8 +110,7 @@ class _HijackRenderSliver extends RenderSliverSingleBoxAdapter {
     // this sliver consumes additionally.
     final scrollExtent = childExtent + _consumingProgress;
 
-    final paintedChildSize =
-        calculatePaintOffset(constraints, from: 0.0, to: childExtent);
+    final paintedChildSize = _calculatePaintExtent(childExtent);
     final cacheExtent =
         calculateCacheOffset(constraints, from: 0.0, to: childExtent);
 
@@ -113,6 +125,90 @@ class _HijackRenderSliver extends RenderSliverSingleBoxAdapter {
       hasVisualOverflow: childExtent > constraints.remainingPaintExtent ||
           constraints.scrollOffset > 0.0,
     );
-    setChildParentData(child!, constraints, geometry!);
+    _setChildParentData(child!, constraints, geometry!);
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (child != null && geometry!.visible) {
+      final childParentData = child!.parentData! as SliverPhysicalParentData;
+      final childPaintOffset = childParentData.paintOffset;
+      context.paintChild(child!, offset + childPaintOffset);
+    }
+  }
+
+  double _calculatePaintExtent(double childExtent) {
+    if (_isConsumingSpace) {
+      // still consuming space;
+      return childExtent;
+    } else {
+      // finish consuming, calculate moving
+      final correctedScrollOffset = _correctedScrollOffset;
+      final remainingPaintExtent = constraints.remainingPaintExtent;
+
+      final maxActiveExtent = correctedScrollOffset + remainingPaintExtent;
+      return clampDouble(
+        clampDouble(childExtent, correctedScrollOffset, maxActiveExtent) -
+            clampDouble(0, correctedScrollOffset, maxActiveExtent),
+        0.0,
+        remainingPaintExtent,
+      );
+    }
+  }
+
+  // @override
+  // double childMainAxisPosition(RenderBox child) {
+  //   final scrollOffset = constraints.scrollOffset;
+
+  //   return -scrollOffset;
+  // }
+
+  void _setChildParentData(
+    RenderObject child,
+    SliverConstraints constraints,
+    SliverGeometry geometry,
+  ) {
+    final childParentData = child.parentData! as SliverPhysicalParentData;
+    final actualGrowthDirection = applyGrowthDirectionToAxisDirection(
+      constraints.axisDirection,
+      constraints.growthDirection,
+    );
+
+    final Offset paintOffset;
+    switch (actualGrowthDirection) {
+      case AxisDirection.up:
+        paintOffset = _isConsumingSpace
+            ? Offset.zero
+            : Offset(
+                0.0,
+                geometry.paintExtent +
+                    constraints.scrollOffset -
+                    geometry.scrollExtent,
+              );
+        break;
+      case AxisDirection.left:
+        paintOffset = _isConsumingSpace
+            ? Offset.zero
+            : Offset(
+                geometry.paintExtent +
+                    constraints.scrollOffset -
+                    geometry.scrollExtent,
+                0.0,
+              );
+        break;
+      case AxisDirection.right:
+        paintOffset = _isConsumingSpace
+            ? Offset.zero
+            : Offset(-_correctedScrollOffset, 0.0);
+        break;
+      case AxisDirection.down:
+        paintOffset = _isConsumingSpace
+            ? Offset.zero
+            : Offset(0.0, -_correctedScrollOffset);
+
+        break;
+    }
+
+    childParentData.paintOffset = paintOffset;
   }
 }
