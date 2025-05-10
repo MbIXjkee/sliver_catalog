@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:sliver_catalog/sliver_catalog.dart';
 
@@ -34,21 +37,17 @@ class DemoSpinnerScreen extends StatelessWidget {
             consumingSpaceSize: 800,
             builder: (context, consumingProgress) {
               return Container(
-                color: Colors.blue,
-                height: 200,
-                child: Center(
-                  child: ValueListenableBuilder(
-                    valueListenable: consumingProgress,
-                    builder: (context, value, child) {
-                      return Text(
-                        'Consuming progress: ${value.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                        ),
-                      );
-                    },
-                  ),
+                color: Colors.grey,
+                height: 300,
+                child: ValueListenableBuilder(
+                  valueListenable: consumingProgress,
+                  builder: (context, value, child) {
+                    return CustomPaint(
+                      painter: _SquaresPainter(
+                        progress: consumingProgress.value,
+                      ),
+                    );
+                  },
                 ),
               );
             },
@@ -67,5 +66,154 @@ class DemoSpinnerScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _SquaresPainter extends CustomPainter {
+  final double progress;
+  final double squareSize = 60;
+  final double padding = 20;
+
+  _SquaresPainter({required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final centerX = size.width / 2;
+    final centerY = size.height / 2;
+
+    final colors = [
+      Colors.red,
+      Colors.green,
+      Colors.blue,
+      Colors.yellow,
+    ];
+    final initialPositions = [
+      Offset(padding, padding),
+      Offset(size.width - squareSize - padding, padding),
+      Offset(padding, size.height - squareSize - padding),
+      Offset(size.width - squareSize - padding,
+          size.height - squareSize - padding),
+    ];
+
+    final destinationPositions = [
+      Offset(centerX - squareSize, centerY - squareSize),
+      Offset(centerX, centerY - squareSize),
+      Offset(centerX - squareSize, centerY),
+      Offset(centerX, centerY),
+    ];
+
+    for (int i = 0; i < 4; i++) {
+      final paint = Paint()..color = colors[i];
+      Offset origin = initialPositions[i];
+      double angle = 0;
+
+      final moveT = progress.clamp(0.0, 0.8);
+      if (moveT < 0.4) {
+        angle = lerpDouble(0, math.pi * 2, moveT / 0.4)!;
+      } else if (moveT < 0.8) {
+        final t = (moveT - 0.4) / 0.4;
+        origin = Offset.lerp(initialPositions[i], destinationPositions[i], t)!;
+      } else {
+        origin = destinationPositions[i];
+      }
+
+      canvas.save();
+      canvas.translate(origin.dx, origin.dy);
+
+      final morphT = ((progress - 0.8) / 0.1).clamp(0.0, 1.0);
+      final pulseT = ((progress - 0.9) / 0.1).clamp(0.0, 1.0);
+      final scale = 1.0 + 0.05 * math.sin(pulseT * 2 * math.pi);
+
+      if (progress >= 0.8) {
+        final radius = squareSize * morphT;
+        final path = switch (i) {
+          0 => _buildTopLeft(squareSize, radius),
+          1 => _buildTopRight(squareSize, radius),
+          2 => _buildBottomLeft(squareSize, radius),
+          3 => _buildBottomRight(squareSize, radius),
+          _ => Path(),
+        };
+        canvas.drawPath(path, paint);
+
+        canvas.save();
+        canvas.translate(squareSize / 2, squareSize / 2);
+        canvas.scale(scale);
+        canvas.translate(-squareSize / 2, -squareSize / 2);
+
+        canvas.drawPath(path, paint);
+        canvas.restore();
+      } else {
+        canvas.translate(squareSize / 2, squareSize / 2);
+        canvas.rotate(angle);
+        canvas.translate(-squareSize / 2, -squareSize / 2);
+        canvas.drawRect(Rect.fromLTWH(0, 0, squareSize, squareSize), paint);
+      }
+
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _SquaresPainter oldDelegate) =>
+      oldDelegate.progress != progress;
+
+  Path _buildTopLeft(double squareSize, double radius) {
+    final path = Path();
+    path.moveTo(squareSize, 0);
+    path.lineTo(radius, 0);
+    path.arcToPoint(
+      Offset(0, radius),
+      radius: Radius.circular(radius),
+      clockwise: false,
+    );
+    path.lineTo(0, squareSize);
+    path.lineTo(squareSize, squareSize);
+    path.close();
+    return path;
+  }
+
+  Path _buildTopRight(double s, double r) {
+    final path = Path();
+    path.moveTo(0, 0);
+    path.lineTo(s - r, 0);
+    path.arcToPoint(
+      Offset(s, r),
+      radius: Radius.circular(r),
+      clockwise: true,
+    );
+    path.lineTo(s, s);
+    path.lineTo(0, s);
+    path.close();
+    return path;
+  }
+
+  Path _buildBottomLeft(double s, double r) {
+    final path = Path();
+    path.moveTo(s, 0);
+    path.lineTo(0, 0);
+    path.lineTo(0, s - r);
+    path.arcToPoint(
+      Offset(r, s),
+      radius: Radius.circular(r),
+      clockwise: false,
+    );
+    path.lineTo(s, s);
+    path.close();
+    return path;
+  }
+
+  Path _buildBottomRight(double s, double r) {
+    final path = Path();
+    path.moveTo(0, 0);
+    path.lineTo(s, 0);
+    path.lineTo(s, s - r);
+    path.arcToPoint(
+      Offset(s - r, s),
+      radius: Radius.circular(r),
+      clockwise: true,
+    );
+    path.lineTo(0, s);
+    path.close();
+    return path;
   }
 }
