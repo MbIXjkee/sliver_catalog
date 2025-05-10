@@ -138,14 +138,17 @@ class _HijackRenderSliver extends RenderSliver
   }
 
   double _calculatePaintExtent(double childExtent) {
+    final remainingPaintExtent = constraints.remainingPaintExtent;
     if (_isConsumingSpace) {
       // still consuming space;
-      // what if childExtent > remainingPaintExtent.
+      if (childExtent > remainingPaintExtent) {
+        return remainingPaintExtent;
+      }
+      
       return childExtent;
     } else {
       // finish consuming, calculate moving
       final correctedScrollOffset = _correctedScrollOffset;
-      final remainingPaintExtent = constraints.remainingPaintExtent;
 
       final maxActiveExtent = correctedScrollOffset + remainingPaintExtent;
 
