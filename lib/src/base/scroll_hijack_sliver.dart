@@ -111,8 +111,8 @@ class _HijackRenderSliver extends RenderSliver
     final scrollExtent = childExtent + _consumingProgress;
 
     final paintedChildSize = _calculatePaintExtent(childExtent);
-    final cacheExtent =
-        calculateCacheOffset(constraints, from: 0.0, to: childExtent);
+    final cacheExtent = _calculateCacheExtent(childExtent);
+    // calculateCacheOffset(constraints, from: 0.0, to: childExtent);
 
     assert(paintedChildSize.isFinite);
     assert(paintedChildSize >= 0.0);
@@ -140,6 +140,7 @@ class _HijackRenderSliver extends RenderSliver
   double _calculatePaintExtent(double childExtent) {
     if (_isConsumingSpace) {
       // still consuming space;
+      // what if childExtent > remainingPaintExtent.
       return childExtent;
     } else {
       // finish consuming, calculate moving
@@ -147,11 +148,39 @@ class _HijackRenderSliver extends RenderSliver
       final remainingPaintExtent = constraints.remainingPaintExtent;
 
       final maxActiveExtent = correctedScrollOffset + remainingPaintExtent;
+
       return clampDouble(
         clampDouble(childExtent, correctedScrollOffset, maxActiveExtent) -
             clampDouble(0, correctedScrollOffset, maxActiveExtent),
         0.0,
         remainingPaintExtent,
+      );
+    }
+  }
+
+  double _calculateCacheExtent(double childExtent) {
+    // what if childExtent > remainingCacheExtent.
+    if (_isConsumingSpace) {
+      return childExtent;
+    } else {
+      // finish consuming, calculate moving
+      final correctedScrollOffset = _correctedScrollOffset;
+      final remainingCacheExtent = constraints.remainingCacheExtent;
+      var scrolledOverCache = correctedScrollOffset + constraints.cacheOrigin;
+      if (scrolledOverCache < 0) {
+        // Since cacheOrigin grows with scroll offset by module up to cache area
+        // size, we can put it as a fact - we cannot calculate corrected
+        // cacheOrigin, but it should be -correctedScrollOffset and give 0,
+        // while we have negative value.
+        scrolledOverCache = 0;
+      }
+      final maxPossibleExtent = correctedScrollOffset + remainingCacheExtent;
+
+      return clampDouble(
+        clampDouble(0, scrolledOverCache, maxPossibleExtent) -
+            clampDouble(childExtent, scrolledOverCache, maxPossibleExtent),
+        0.0,
+        remainingCacheExtent,
       );
     }
   }
