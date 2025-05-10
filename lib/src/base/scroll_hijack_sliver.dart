@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
 
 class ScrollHijackSliver extends StatefulWidget {
   final double consumingSpaceSize;
@@ -13,17 +14,38 @@ class ScrollHijackSliver extends StatefulWidget {
     super.key,
     required this.consumingSpaceSize,
     required this.builder,
-  });
+  }) : assert(
+          consumingSpaceSize > 0,
+          // ignore: lines_longer_than_80_chars
+          'consumingSpaceSize must be positive, otherwise this sliver is useless',
+        );
 
   @override
   State<ScrollHijackSliver> createState() => _ScrollHijackSliverState();
 }
 
-class _ScrollHijackSliverState extends State<ScrollHijackSliver> {
+class _ScrollHijackSliverState extends State<ScrollHijackSliver>
+    with SingleTickerProviderStateMixin {
   final ValueNotifier<double> _consumingProgress = ValueNotifier(0.0);
+  late final Ticker _ticker;
+
+  double _lastHandled = 0;
+  double _toHandle = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _ticker = createTicker(_onTick);
+    _ticker.start();
+  }
 
   @override
   void dispose() {
+    _ticker
+      ..stop()
+      ..dispose();
+
     _consumingProgress.dispose();
 
     super.dispose();
@@ -33,19 +55,37 @@ class _ScrollHijackSliverState extends State<ScrollHijackSliver> {
   Widget build(BuildContext context) {
     return _HijackSliver(
       consumingSpaceSize: widget.consumingSpaceSize,
+      onProgressChanged: _onProgressChanged,
       child: widget.builder(
         context,
         _consumingProgress,
       ),
     );
   }
+
+  // ignore: use_setters_to_change_properties
+  void _onProgressChanged(double newProgress) {
+    _toHandle = newProgress;
+  }
+
+  void _onTick(Duration elapsed) {
+    final last = _lastHandled;
+    final current = _toHandle;
+    if (last != current) {
+      _consumingProgress.value =
+          clampDouble(current / widget.consumingSpaceSize, 0.0, 1.0);
+      _lastHandled = current;
+    }
+  }
 }
 
 class _HijackSliver extends SingleChildRenderObjectWidget {
   final double consumingSpaceSize;
+  final void Function(double progress) onProgressChanged;
 
   const _HijackSliver({
     required this.consumingSpaceSize,
+    required this.onProgressChanged,
     required super.child,
   });
 
@@ -53,6 +93,7 @@ class _HijackSliver extends SingleChildRenderObjectWidget {
   RenderObject createRenderObject(BuildContext context) {
     return _HijackRenderSliver(
       consumingProgress: consumingSpaceSize,
+      onProgressChanged: onProgressChanged,
     );
   }
 
@@ -61,13 +102,16 @@ class _HijackSliver extends SingleChildRenderObjectWidget {
     BuildContext context,
     _HijackRenderSliver renderObject,
   ) {
-    renderObject.consumingProgress = consumingSpaceSize;
+    renderObject
+      ..consumingProgress = consumingSpaceSize
+      ..onProgressChanged = onProgressChanged;
   }
 }
 
 class _HijackRenderSliver extends RenderSliver
     with RenderObjectWithChildMixin<RenderBox>, RenderSliverHelpers {
   double _consumingProgress;
+  void Function(double progress) _onProgressChanged;
 
   bool get _isConsumingSpace => constraints.scrollOffset <= _consumingProgress;
 
@@ -83,9 +127,20 @@ class _HijackRenderSliver extends RenderSliver
     markNeedsLayout();
   }
 
+  void Function(double progress) get onProgressChanged => _onProgressChanged;
+  set onProgressChanged(void Function(double progress) value) {
+    if (_onProgressChanged == value) {
+      return;
+    }
+    _onProgressChanged = value;
+    markNeedsLayout();
+  }
+
   _HijackRenderSliver({
     required double consumingProgress,
-  }) : _consumingProgress = consumingProgress;
+    required void Function(double progress) onProgressChanged,
+  })  : _consumingProgress = consumingProgress,
+        _onProgressChanged = onProgressChanged;
 
   @override
   void setupParentData(RenderObject child) {
@@ -112,7 +167,6 @@ class _HijackRenderSliver extends RenderSliver
 
     final paintedChildSize = _calculatePaintExtent(childExtent);
     final cacheExtent = _calculateCacheExtent(childExtent);
-    // calculateCacheOffset(constraints, from: 0.0, to: childExtent);
 
     assert(paintedChildSize.isFinite);
     assert(paintedChildSize >= 0.0);
@@ -126,6 +180,7 @@ class _HijackRenderSliver extends RenderSliver
           constraints.scrollOffset > 0.0,
     );
     _setChildParentData(child!, constraints, geometry!);
+    _updateConsumingProgress();
   }
 
   @override
@@ -236,5 +291,15 @@ class _HijackRenderSliver extends RenderSliver
     };
 
     childParentData.paintOffset = paintOffset;
+  }
+
+  void _updateConsumingProgress() {
+    onProgressChanged(
+      clampDouble(
+        constraints.scrollOffset,
+        0,
+        consumingProgress,
+      ),
+    );
   }
 }
