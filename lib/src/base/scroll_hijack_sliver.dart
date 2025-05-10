@@ -139,12 +139,13 @@ class _HijackRenderSliver extends RenderSliver
 
   double _calculatePaintExtent(double childExtent) {
     final remainingPaintExtent = constraints.remainingPaintExtent;
+
     if (_isConsumingSpace) {
       // still consuming space;
       if (childExtent > remainingPaintExtent) {
         return remainingPaintExtent;
       }
-      
+
       return childExtent;
     } else {
       // finish consuming, calculate moving
@@ -162,13 +163,18 @@ class _HijackRenderSliver extends RenderSliver
   }
 
   double _calculateCacheExtent(double childExtent) {
-    // what if childExtent > remainingCacheExtent.
+    final remainingCacheExtent = constraints.remainingCacheExtent;
+
     if (_isConsumingSpace) {
+      if (childExtent > remainingCacheExtent) {
+        return remainingCacheExtent;
+      }
+
       return childExtent;
     } else {
       // finish consuming, calculate moving
       final correctedScrollOffset = _correctedScrollOffset;
-      final remainingCacheExtent = constraints.remainingCacheExtent;
+
       var scrolledOverCache = correctedScrollOffset + constraints.cacheOrigin;
       if (scrolledOverCache < 0) {
         // Since cacheOrigin grows with scroll offset by module up to cache area
