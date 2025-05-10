@@ -71,24 +71,26 @@ class DemoSpinnerScreen extends StatelessWidget {
 
 class _SquaresPainter extends CustomPainter {
   final double progress;
-  final double squareSize = 60;
-  final double padding = 20;
 
   _SquaresPainter({required this.progress});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final centerX = size.width / 2;
-    final centerY = size.height / 2;
-
-    final colors = [
+    const squareSize = 60.0;
+    const halfSquareSize = squareSize / 2;
+    const padding = 20.0;
+    const colors = [
       Colors.red,
       Colors.green,
       Colors.blue,
       Colors.yellow,
     ];
+
+    final centerX = size.width / 2;
+    final centerY = size.height / 2;
+
     final initialPositions = [
-      Offset(padding, padding),
+      const Offset(padding, padding),
       Offset(size.width - squareSize - padding, padding),
       Offset(padding, size.height - squareSize - padding),
       Offset(size.width - squareSize - padding,
@@ -127,26 +129,29 @@ class _SquaresPainter extends CustomPainter {
       if (progress >= 0.8) {
         final radius = squareSize * morphT;
         final path = switch (i) {
-          0 => _buildTopLeft(squareSize, radius),
-          1 => _buildTopRight(squareSize, radius),
-          2 => _buildBottomLeft(squareSize, radius),
-          3 => _buildBottomRight(squareSize, radius),
+          0 => _buildTopLeftMorphing(squareSize, radius),
+          1 => _buildTopRightMorphing(squareSize, radius),
+          2 => _buildBottomLeftMorphing(squareSize, radius),
+          3 => _buildBottomRightMorphing(squareSize, radius),
           _ => Path(),
         };
         canvas.drawPath(path, paint);
 
         canvas.save();
-        canvas.translate(squareSize / 2, squareSize / 2);
+        canvas.translate(halfSquareSize, halfSquareSize);
         canvas.scale(scale);
-        canvas.translate(-squareSize / 2, -squareSize / 2);
+        canvas.translate(-halfSquareSize, -halfSquareSize);
 
         canvas.drawPath(path, paint);
         canvas.restore();
       } else {
-        canvas.translate(squareSize / 2, squareSize / 2);
+        canvas.translate(halfSquareSize, halfSquareSize);
         canvas.rotate(angle);
-        canvas.translate(-squareSize / 2, -squareSize / 2);
-        canvas.drawRect(Rect.fromLTWH(0, 0, squareSize, squareSize), paint);
+        canvas.translate(-halfSquareSize, -halfSquareSize);
+        canvas.drawRect(
+          const Rect.fromLTWH(0, 0, squareSize, squareSize),
+          paint,
+        );
       }
 
       canvas.restore();
@@ -157,22 +162,22 @@ class _SquaresPainter extends CustomPainter {
   bool shouldRepaint(covariant _SquaresPainter oldDelegate) =>
       oldDelegate.progress != progress;
 
-  Path _buildTopLeft(double squareSize, double radius) {
+  Path _buildTopLeftMorphing(double s, double r) {
     final path = Path();
-    path.moveTo(squareSize, 0);
-    path.lineTo(radius, 0);
+    path.moveTo(s, 0);
+    path.lineTo(r, 0);
     path.arcToPoint(
-      Offset(0, radius),
-      radius: Radius.circular(radius),
+      Offset(0, r),
+      radius: Radius.circular(r),
       clockwise: false,
     );
-    path.lineTo(0, squareSize);
-    path.lineTo(squareSize, squareSize);
+    path.lineTo(0, s);
+    path.lineTo(s, s);
     path.close();
     return path;
   }
 
-  Path _buildTopRight(double s, double r) {
+  Path _buildTopRightMorphing(double s, double r) {
     final path = Path();
     path.moveTo(0, 0);
     path.lineTo(s - r, 0);
@@ -187,7 +192,7 @@ class _SquaresPainter extends CustomPainter {
     return path;
   }
 
-  Path _buildBottomLeft(double s, double r) {
+  Path _buildBottomLeftMorphing(double s, double r) {
     final path = Path();
     path.moveTo(s, 0);
     path.lineTo(0, 0);
@@ -202,7 +207,7 @@ class _SquaresPainter extends CustomPainter {
     return path;
   }
 
-  Path _buildBottomRight(double s, double r) {
+  Path _buildBottomRightMorphing(double s, double r) {
     final path = Path();
     path.moveTo(0, 0);
     path.lineTo(s, 0);
