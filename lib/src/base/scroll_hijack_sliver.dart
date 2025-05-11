@@ -251,7 +251,36 @@ class _HijackRenderSliver extends RenderSliver
 
   @override
   double childMainAxisPosition(RenderBox child) {
+    if (_isConsumingSpace) {
+      return 0;
+    }
+
     return -_correctedScrollOffset;
+  }
+
+  @override
+  void applyPaintTransform(RenderObject child, Matrix4 transform) {
+    assert(child == this.child);
+    (child.parentData! as SliverPhysicalParentData)
+        .applyPaintTransform(transform);
+  }
+
+  @override
+  bool hitTestChildren(
+    SliverHitTestResult result, {
+    required double mainAxisPosition,
+    required double crossAxisPosition,
+  }) {
+    assert(geometry!.hitTestExtent > 0.0);
+    if (child != null) {
+      return hitTestBoxChild(
+        BoxHitTestResult.wrap(result),
+        child!,
+        mainAxisPosition: mainAxisPosition,
+        crossAxisPosition: crossAxisPosition,
+      );
+    }
+    return false;
   }
 
   void _setChildParentData(
