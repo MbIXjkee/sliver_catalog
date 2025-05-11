@@ -52,6 +52,25 @@ class DemoSpinnerScreen extends StatelessWidget {
               );
             },
           ),
+          ScrollHijackSliver(
+            consumingSpaceSize: 800,
+            builder: (context, consumingProgress) {
+              return Container(
+                color: Colors.brown,
+                height: 300,
+                child: ValueListenableBuilder(
+                  valueListenable: consumingProgress,
+                  builder: (context, value, child) {
+                    return CustomPaint(
+                      painter: _SquaresPainter(
+                        progress: consumingProgress.value,
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
           for (int i = 0; i < 10; i++)
             SliverToBoxAdapter(
               child: Container(
