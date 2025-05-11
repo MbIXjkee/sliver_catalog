@@ -3,8 +3,50 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 
+/// A custom sliver widget that consumes a specified amount of scrollable space
+/// before allowing its child to start scrolling. This widget is useful for
+/// creating custom content animation based on scroll progress.
+///
+/// The [ScrollHijackSliver] widget takes a [consumingSpaceSize] parameter,
+/// which defines the amount of scrollable space it consumes, and a [builder]
+/// function that builds the child widget.
+///
+/// The consuming progress (how much of the space has been scrolled in
+/// fractions of 1) is exposed as a [ValueListenable] to the builder function,
+/// allowing dynamic updates based on the scroll progress. 0 means no space
+/// has been consumed, and 1 means the entire space has already been consumed.
+///
+/// Change of the progress doesn't lead to automatic rebuild of the widget,
+/// but changes only a value in notifier of the progress value.
+///
+/// Example usage:
+/// ```dart
+/// ScrollHijackSliver(
+///   consumingSpaceSize: 100.0,
+///   builder: (context, consumingProgress) {
+///     return Container(
+///       height: 200.0,
+///       color: Colors.blue,
+///       child: Center(
+///         child: ValueListenableBuilder<double>(
+///           valueListenable: consumingProgress,
+///           builder: (context, value, child) {
+///             return Text(
+///               'Progress: $value',
+///             );
+///           },
+///         ),
+///       ),
+///     );
+///   },
+/// )
+/// ```
+///
+/// This widget is only compatible with sliver protocol.
 class ScrollHijackSliver extends StatefulWidget {
+  /// The size of the space that should be consumed.
   final double consumingSpaceSize;
+  /// A builder function that builds the child subtree.
   final Widget Function(
     BuildContext context,
     ValueListenable<double> consumingProgress,
