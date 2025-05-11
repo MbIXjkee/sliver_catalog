@@ -249,12 +249,10 @@ class _HijackRenderSliver extends RenderSliver
     }
   }
 
-  // @override
-  // double childMainAxisPosition(RenderBox child) {
-  //   final scrollOffset = constraints.scrollOffset;
-
-  //   return -scrollOffset;
-  // }
+  @override
+  double childMainAxisPosition(RenderBox child) {
+    return -_correctedScrollOffset;
+  }
 
   void _setChildParentData(
     RenderObject child,
