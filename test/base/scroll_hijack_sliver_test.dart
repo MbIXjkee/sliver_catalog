@@ -1,3 +1,5 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sliver_catalog/src/base/scroll_hijack_sliver.dart';
@@ -80,7 +82,6 @@ void main() {
       );
 
       group(
-        // ignore: lines_longer_than_80_chars
         'calculation progress for ScrollHijackProgressBehavior.onlyConsumingSpace:',
         () {
           testWidgets(
@@ -121,7 +122,6 @@ void main() {
       );
 
       group(
-        // ignore: lines_longer_than_80_chars
         'calculation progress for ScrollHijackProgressBehavior.consumingSpaceAndMoving:',
         () {
           testWidgets(
@@ -193,7 +193,6 @@ void main() {
       );
 
       testWidgets(
-        // ignore: lines_longer_than_80_chars
         'Child content remains visible and moves after consuming phase correctly',
         (tester) async {
           await tester.pumpWidget(createTestWidget());
@@ -217,6 +216,99 @@ void main() {
             tester.getTopLeft(find.byKey(contentKey)).dy,
             closeTo(-50.0, 0.0),
           );
+        },
+      );
+
+      group(
+        'initial scroll offset should be handled correctly in progress calculation',
+        () {
+          final testCases = [
+            (
+              behavior: ScrollHijackProgressBehavior.onlyConsumingSpace,
+              offset: 0.0,
+              progress: '0.00'
+            ),
+            (
+              behavior: ScrollHijackProgressBehavior.onlyConsumingSpace,
+              offset: 50.0,
+              progress: '0.25'
+            ),
+            (
+              behavior: ScrollHijackProgressBehavior.onlyConsumingSpace,
+              offset: 100.0,
+              progress: '0.50'
+            ),
+            (
+              behavior: ScrollHijackProgressBehavior.onlyConsumingSpace,
+              offset: 150.0,
+              progress: '0.75'
+            ),
+            (
+              behavior: ScrollHijackProgressBehavior.onlyConsumingSpace,
+              offset: 200.0,
+              progress: '1.00'
+            ),
+            (
+              behavior: ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+              offset: 0.0,
+              progress: '0.00'
+            ),
+            (
+              behavior: ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+              offset: 50.0,
+              progress: '0.10'
+            ),
+            (
+              behavior: ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+              offset: 100.0,
+              progress: '0.20'
+            ),
+            (
+              behavior: ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+              offset: 200.0,
+              progress: '0.40'
+            ),
+            (
+              behavior: ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+              offset: 250.0,
+              progress: '0.50'
+            ),
+            (
+              behavior: ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+              offset: 400.0,
+              progress: '0.80'
+            ),
+            (
+              behavior: ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+              offset: 500.0,
+              progress: '1.00'
+            ),
+            (
+              behavior: ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+              offset: 600.0,
+              progress: '1.00'
+            ),
+          ];
+
+          for (final testCase in testCases) {
+            final (:behavior, :offset, :progress) = testCase;
+
+            testWidgets(
+              '$behavior with offset=$offset',
+              (tester) async {
+                // Need to recreate controller.
+                controller.dispose();
+                controller = ScrollController(initialScrollOffset: offset);
+                await tester.pumpWidget(createTestWidget(behavior));
+                await tester.pumpAndSettle();
+
+                expect(
+                  find.text(progress, skipOffstage: false),
+                  findsOneWidget,
+                );
+              },
+            );
+          }
         },
       );
     },
