@@ -30,16 +30,26 @@ enum ScrollHijackProgressBehavior {
 /// creating custom content animation based on scroll progress.
 ///
 /// The [ScrollHijackSliver] widget takes a [consumingSpaceSize] parameter,
-/// which defines the amount of scrollable space it consumes, and a [builder]
-/// function that builds the child widget.
+/// which defines the amount of scrollable space it consumes before
+/// start moving, [progressBehavior] to define how to process the progress,
+/// and a [builder] function that builds the child widget.
 ///
-/// The consuming progress (how much of the space has been scrolled in
-/// fractions of 1) is exposed as a [ValueListenable] to the builder function,
-/// allowing dynamic updates based on the scroll progress. 0 means no space
-/// has been consumed, and 1 means the entire space has already been consumed.
+/// The consuming progress (how much of the space has been scrolled as a value
+/// between 0.0 and 1.0) is exposed as a [ValueListenable] to the builder
+/// function, allowing dynamic updates based on the scroll progress.
+/// The meaning of progress depends on [progressBehavior]:
+/// - For [ScrollHijackProgressBehavior.onlyConsumingSpace], 0 means no space
+///   has been consumed, and 1 means the entire [consumingSpaceSize]
+///   has been consumed.
+/// - For [ScrollHijackProgressBehavior.consumingSpaceAndMoving], 0 means
+///   no space has been consumed, and 1 means both the consuming space and the
+///   child have fully scrolled through the viewport.
 ///
-/// Change of the progress doesn't lead to automatic rebuild of the widget,
-/// but changes only a value in notifier of the progress value.
+/// Note:
+/// - Changing progress does not trigger a widget rebuild.
+///   Instead, the [ValueListenable] updates independently and should be
+///   observed (e.g., with [ValueListenableBuilder]) to reflect changes.
+/// - This widget is only compatible with sliver protocol.
 ///
 /// Example usage:
 /// ```dart
@@ -64,7 +74,11 @@ enum ScrollHijackProgressBehavior {
 /// )
 /// ```
 ///
-/// This widget is only compatible with sliver protocol.
+/// See also:
+///
+/// * [ScrollHijackProgressBehavior] — defines how progress is calculated.
+/// * [ValueListenableBuilder] — to react to scroll progress changes.
+/// * [RenderSliver] — base protocol for custom sliver rendering.
 class ScrollHijackSliver extends StatefulWidget {
   /// The size of the space that should be consumed.
   final double consumingSpaceSize;
@@ -166,7 +180,7 @@ class _HijackSliver extends SingleChildRenderObjectWidget {
   @override
   RenderObject createRenderObject(BuildContext context) {
     return _HijackRenderSliver(
-      consumingProgress: consumingSpaceSize,
+      consumingSpaceSize: consumingSpaceSize,
       progressBehavior: progressBehavior,
       onProgressChanged: onProgressChanged,
     );
@@ -178,7 +192,7 @@ class _HijackSliver extends SingleChildRenderObjectWidget {
     _HijackRenderSliver renderObject,
   ) {
     renderObject
-      ..consumingProgress = consumingSpaceSize
+      ..consumingSpaceSize = consumingSpaceSize
       ..progressBehavior = progressBehavior
       ..onProgressChanged = onProgressChanged;
   }
@@ -186,21 +200,21 @@ class _HijackSliver extends SingleChildRenderObjectWidget {
 
 class _HijackRenderSliver extends RenderSliver
     with RenderObjectWithChildMixin<RenderBox>, RenderSliverHelpers {
-  double _consumingProgress;
+  double _consumingSpaceSize;
   ScrollHijackProgressBehavior _progressBehavior;
   void Function(double progress) _onProgressChanged;
 
-  bool get _isConsumingSpace => constraints.scrollOffset <= _consumingProgress;
+  bool get _isConsumingSpace => constraints.scrollOffset <= _consumingSpaceSize;
 
   double get _correctedScrollOffset =>
-      constraints.scrollOffset - _consumingProgress;
+      constraints.scrollOffset - _consumingSpaceSize;
 
-  double get consumingProgress => _consumingProgress;
-  set consumingProgress(double value) {
-    if (_consumingProgress == value) {
+  double get consumingSpaceSize => _consumingSpaceSize;
+  set consumingSpaceSize(double value) {
+    if (_consumingSpaceSize == value) {
       return;
     }
-    _consumingProgress = value;
+    _consumingSpaceSize = value;
     markNeedsLayout();
   }
 
@@ -223,10 +237,10 @@ class _HijackRenderSliver extends RenderSliver
   }
 
   _HijackRenderSliver({
-    required double consumingProgress,
+    required double consumingSpaceSize,
     required ScrollHijackProgressBehavior progressBehavior,
     required void Function(double progress) onProgressChanged,
-  })  : _consumingProgress = consumingProgress,
+  })  : _consumingSpaceSize = consumingSpaceSize,
         _progressBehavior = progressBehavior,
         _onProgressChanged = onProgressChanged;
 
@@ -251,7 +265,7 @@ class _HijackRenderSliver extends RenderSliver
     };
     // The scroll extent is the size of the child plus the amount of space
     // this sliver consumes additionally.
-    final scrollExtent = childExtent + _consumingProgress;
+    final scrollExtent = childExtent + _consumingSpaceSize;
 
     final paintedChildSize = _calculatePaintExtent(childExtent);
     final cacheExtent = _calculateCacheExtent(childExtent);
@@ -412,7 +426,7 @@ class _HijackRenderSliver extends RenderSliver
     final scrollOffset = constraints.scrollOffset;
     final totalExtent =
         _progressBehavior == ScrollHijackProgressBehavior.onlyConsumingSpace
-            ? _consumingProgress
+            ? _consumingSpaceSize
             : geometry!.scrollExtent;
     final progress = clampDouble(scrollOffset / totalExtent, 0.0, 1.0);
 
