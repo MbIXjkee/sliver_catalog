@@ -17,7 +17,10 @@ void main() {
         controller.dispose();
       });
 
-      Widget createTestWidget() {
+      Widget createTestWidget([
+        ScrollHijackProgressBehavior behavior =
+            ScrollHijackProgressBehavior.onlyConsumingSpace,
+      ]) {
         return MaterialApp(
           home: Scaffold(
             body: CustomScrollView(
@@ -25,6 +28,7 @@ void main() {
               slivers: [
                 ScrollHijackSliver(
                   consumingSpaceSize: 200.0,
+                  progressBehavior: behavior,
                   builder: (context, progress) {
                     return SizedBox(
                       key: contentKey,
@@ -75,40 +79,116 @@ void main() {
         },
       );
 
-      testWidgets(
-        'Initial consumingProgress is zero',
-        (tester) async {
-          await tester.pumpWidget(createTestWidget());
+      group(
+        // ignore: lines_longer_than_80_chars
+        'calculation progress for ScrollHijackProgressBehavior.onlyConsumingSpace:',
+        () {
+          testWidgets(
+            'Initial consumingProgress is zero',
+            (tester) async {
+              await tester.pumpWidget(createTestWidget());
 
-          await tester.pump(const Duration(milliseconds: 50));
+              expect(find.text('0.00'), findsOneWidget);
+            },
+          );
 
-          expect(find.text('0.00'), findsOneWidget);
+          testWidgets(
+            'consumingProgress updates proportionally while consuming space',
+            (tester) async {
+              await tester.pumpWidget(createTestWidget());
+
+              await scrollTo(100, tester);
+
+              expect(find.text('0.50'), findsOneWidget);
+
+              await scrollTo(200, tester);
+
+              expect(find.text('1.00'), findsOneWidget);
+            },
+          );
+
+          testWidgets(
+            'consumingProgress caps at 1.0 once consuming space is exceeded',
+            (tester) async {
+              await tester.pumpWidget(createTestWidget());
+
+              await scrollTo(300, tester);
+
+              expect(find.text('1.00'), findsOneWidget);
+            },
+          );
         },
       );
 
-      testWidgets(
-        'consumingProgress updates proportionally while consuming space',
-        (tester) async {
-          await tester.pumpWidget(createTestWidget());
+      group(
+        // ignore: lines_longer_than_80_chars
+        'calculation progress for ScrollHijackProgressBehavior.consumingSpaceAndMoving:',
+        () {
+          testWidgets(
+            'Initial consumingProgress is zero',
+            (tester) async {
+              await tester.pumpWidget(
+                createTestWidget(
+                  ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+                ),
+              );
 
-          await scrollTo(100, tester);
+              expect(find.text('0.00'), findsOneWidget);
+            },
+          );
 
-          expect(find.text('0.50'), findsOneWidget);
+          testWidgets(
+            'consumingProgress updates proportionally while consuming space',
+            (tester) async {
+              await tester.pumpWidget(
+                createTestWidget(
+                  ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+                ),
+              );
 
-          await scrollTo(200, tester);
+              await scrollTo(100, tester);
 
-          expect(find.text('1.00'), findsOneWidget);
-        },
-      );
+              expect(find.text('0.20'), findsOneWidget);
 
-      testWidgets(
-        'consumingProgress caps at 1.0 once consuming space is exceeded',
-        (tester) async {
-          await tester.pumpWidget(createTestWidget());
+              await scrollTo(200, tester);
 
-          await scrollTo(300, tester);
+              expect(find.text('0.40'), findsOneWidget);
+            },
+          );
 
-          expect(find.text('1.00'), findsOneWidget);
+          testWidgets(
+            'consumingProgress continues to increase as child scrolls out',
+            (tester) async {
+              await tester.pumpWidget(
+                createTestWidget(
+                  ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+                ),
+              );
+
+              await scrollTo(350, tester);
+
+              expect(find.text('0.70'), findsOneWidget);
+
+              await scrollTo(500, tester);
+
+              expect(find.text('1.00', skipOffstage: false), findsOneWidget);
+            },
+          );
+
+          testWidgets(
+            'consumingProgress caps at 1.0 after all scrolled out',
+            (tester) async {
+              await tester.pumpWidget(
+                createTestWidget(
+                  ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+                ),
+              );
+
+              await scrollTo(600, tester);
+
+              expect(find.text('1.00', skipOffstage: false), findsOneWidget);
+            },
+          );
         },
       );
 
@@ -133,8 +213,10 @@ void main() {
 
           await scrollTo(250, tester);
 
-          expect(tester.getTopLeft(find.byKey(contentKey)).dy,
-              closeTo(-50.0, 0.0));
+          expect(
+            tester.getTopLeft(find.byKey(contentKey)).dy,
+            closeTo(-50.0, 0.0),
+          );
         },
       );
     },
