@@ -93,18 +93,32 @@ void main() {
             },
           );
 
-          testWidgets(
+          group(
             'consumingProgress updates proportionally while consuming space',
-            (tester) async {
-              await tester.pumpWidget(createTestWidget());
+            () {
+              final testCases = [
+                (scrollOffset: 0.0, expectedProgress: '0.00'),
+                (scrollOffset: 25.0, expectedProgress: '0.13'),
+                (scrollOffset: 50.0, expectedProgress: '0.25'),
+                (scrollOffset: 75.0, expectedProgress: '0.38'),
+                (scrollOffset: 100.0, expectedProgress: '0.50'),
+                (scrollOffset: 150.0, expectedProgress: '0.75'),
+                (scrollOffset: 200.0, expectedProgress: '1.00'),
+                (scrollOffset: 300.0, expectedProgress: '1.00'),
+              ];
 
-              await scrollTo(100, tester);
+              for (final testCase in testCases) {
+                final (:scrollOffset, :expectedProgress) = testCase;
 
-              expect(find.text('0.50'), findsOneWidget);
-
-              await scrollTo(200, tester);
-
-              expect(find.text('1.00'), findsOneWidget);
+                testWidgets(
+                  'shows $expectedProgress for scrollOffset=$scrollOffset',
+                  (tester) async {
+                    await tester.pumpWidget(createTestWidget());
+                    await scrollTo(scrollOffset, tester);
+                    expect(find.text(expectedProgress), findsOneWidget);
+                  },
+                );
+              }
             },
           );
 
@@ -137,22 +151,40 @@ void main() {
             },
           );
 
-          testWidgets(
-            'consumingProgress updates proportionally while consuming space',
-            (tester) async {
-              await tester.pumpWidget(
-                createTestWidget(
-                  ScrollHijackProgressBehavior.consumingSpaceAndMoving,
-                ),
-              );
+          group(
+            'consumingProgress updates proportionally for consumingSpaceAndMoving',
+            () {
+              final testCases = [
+                (scrollOffset: 0.0, expectedProgress: '0.00'),
+                (scrollOffset: 50.0, expectedProgress: '0.10'),
+                (scrollOffset: 100.0, expectedProgress: '0.20'),
+                (scrollOffset: 150.0, expectedProgress: '0.30'),
+                (scrollOffset: 200.0, expectedProgress: '0.40'),
+                (scrollOffset: 250.0, expectedProgress: '0.50'),
+                (scrollOffset: 400.0, expectedProgress: '0.80'),
+                (scrollOffset: 500.0, expectedProgress: '1.00'),
+                (scrollOffset: 600.0, expectedProgress: '1.00'),
+              ];
 
-              await scrollTo(100, tester);
+              for (final testCase in testCases) {
+                final (:scrollOffset, :expectedProgress) = testCase;
 
-              expect(find.text('0.20'), findsOneWidget);
-
-              await scrollTo(200, tester);
-
-              expect(find.text('0.40'), findsOneWidget);
+                testWidgets(
+                  'shows $expectedProgress for scrollOffset=$scrollOffset',
+                  (tester) async {
+                    await tester.pumpWidget(
+                      createTestWidget(
+                        ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+                      ),
+                    );
+                    await scrollTo(scrollOffset, tester);
+                    expect(
+                      find.text(expectedProgress, skipOffstage: false),
+                      findsOneWidget,
+                    );
+                  },
+                );
+              }
             },
           );
 
