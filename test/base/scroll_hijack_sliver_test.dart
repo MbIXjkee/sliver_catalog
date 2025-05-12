@@ -18,18 +18,18 @@ void main() {
       tearDown(() {
         controller.dispose();
       });
-
-      Widget createTestWidget([
+      Widget createTestWidget({
         ScrollHijackProgressBehavior behavior =
             ScrollHijackProgressBehavior.onlyConsumingSpace,
-      ]) {
+        double consumingSpaceSize = 200,
+      }) {
         return MaterialApp(
           home: Scaffold(
             body: CustomScrollView(
               controller: controller,
               slivers: [
                 ScrollHijackSliver(
-                  consumingSpaceSize: 200.0,
+                  consumingSpaceSize: consumingSpaceSize,
                   progressBehavior: behavior,
                   builder: (context, progress) {
                     return SizedBox(
@@ -143,7 +143,8 @@ void main() {
             (tester) async {
               await tester.pumpWidget(
                 createTestWidget(
-                  ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+                  behavior:
+                      ScrollHijackProgressBehavior.consumingSpaceAndMoving,
                 ),
               );
 
@@ -174,7 +175,8 @@ void main() {
                   (tester) async {
                     await tester.pumpWidget(
                       createTestWidget(
-                        ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+                        behavior: ScrollHijackProgressBehavior
+                            .consumingSpaceAndMoving,
                       ),
                     );
                     await scrollTo(scrollOffset, tester);
@@ -193,7 +195,8 @@ void main() {
             (tester) async {
               await tester.pumpWidget(
                 createTestWidget(
-                  ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+                  behavior:
+                      ScrollHijackProgressBehavior.consumingSpaceAndMoving,
                 ),
               );
 
@@ -212,7 +215,8 @@ void main() {
             (tester) async {
               await tester.pumpWidget(
                 createTestWidget(
-                  ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+                  behavior:
+                      ScrollHijackProgressBehavior.consumingSpaceAndMoving,
                 ),
               );
 
@@ -331,7 +335,7 @@ void main() {
                 // Need to recreate controller.
                 controller.dispose();
                 controller = ScrollController(initialScrollOffset: offset);
-                await tester.pumpWidget(createTestWidget(behavior));
+                await tester.pumpWidget(createTestWidget(behavior: behavior));
                 await tester.pumpAndSettle();
 
                 expect(
@@ -343,6 +347,48 @@ void main() {
           }
         },
       );
+
+      group('widget update should be handled correctly', () {
+        testWidgets(
+          'change consumingSpaceSize should change the progress',
+          (tester) async {
+            await tester.pumpWidget(createTestWidget());
+
+            await scrollTo(100, tester);
+
+            expect(find.text('0.50'), findsOneWidget);
+
+            await tester.pumpWidget(
+              createTestWidget(consumingSpaceSize: 500),
+            );
+
+            await tester.pumpAndSettle();
+
+            expect(find.text('0.20'), findsOneWidget);
+          },
+        );
+
+        testWidgets(
+          'change progressBehavior should change the progress',
+          (tester) async {
+            await tester.pumpWidget(createTestWidget());
+
+            await scrollTo(100, tester);
+
+            expect(find.text('0.50'), findsOneWidget);
+
+            await tester.pumpWidget(
+              createTestWidget(
+                behavior: ScrollHijackProgressBehavior.consumingSpaceAndMoving,
+              ),
+            );
+
+            await tester.pumpAndSettle();
+
+            expect(find.text('0.20'), findsOneWidget);
+          },
+        );
+      });
     },
   );
 }
