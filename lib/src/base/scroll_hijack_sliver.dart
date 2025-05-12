@@ -46,6 +46,7 @@ import 'package:flutter/scheduler.dart';
 class ScrollHijackSliver extends StatefulWidget {
   /// The size of the space that should be consumed.
   final double consumingSpaceSize;
+
   /// A builder function that builds the child subtree.
   final Widget Function(
     BuildContext context,
@@ -79,13 +80,12 @@ class _ScrollHijackSliverState extends State<ScrollHijackSliver>
     super.initState();
 
     _ticker = createTicker(_onTick);
-    _ticker.start();
   }
 
   @override
   void dispose() {
     _ticker
-      ..stop()
+      ..stop(canceled: true)
       ..dispose();
 
     _consumingProgress.dispose();
@@ -108,6 +108,14 @@ class _ScrollHijackSliverState extends State<ScrollHijackSliver>
   // ignore: use_setters_to_change_properties
   void _onProgressChanged(double newProgress) {
     _toHandle = newProgress;
+
+    if (_toHandle != _lastHandled) {
+      if (!_ticker.isActive) {
+        _ticker.start();
+      }
+    } else {
+      _ticker.stop();
+    }
   }
 
   void _onTick(Duration elapsed) {
@@ -118,6 +126,8 @@ class _ScrollHijackSliverState extends State<ScrollHijackSliver>
           clampDouble(current / widget.consumingSpaceSize, 0.0, 1.0);
       _lastHandled = current;
     }
+
+    _ticker.stop();
   }
 }
 
