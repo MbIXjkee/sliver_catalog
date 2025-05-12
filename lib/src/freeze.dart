@@ -23,7 +23,7 @@ class FreezeSliver extends StatefulWidget {
 }
 
 class _FreezeSliverState extends State<FreezeSliver> {
-  late final Future<ui.FragmentShader?> _shaderFuture;
+  late final Future<DefaultLeavingViewportShader?> _shaderFuture;
 
   @override
   void initState() {
@@ -36,7 +36,7 @@ class _FreezeSliverState extends State<FreezeSliver> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<ui.FragmentShader?>(
+    return FutureBuilder<DefaultLeavingViewportShader?>(
       future: _shaderFuture,
       builder: (context, snapshot) {
         final shader = snapshot.data;
@@ -49,7 +49,7 @@ class _FreezeSliverState extends State<FreezeSliver> {
     );
   }
 
-  Future<ui.FragmentShader?> _initShader() async {
+  Future<DefaultLeavingViewportShader?> _initShader() async {
     try {
       final program = await ui.FragmentProgram.fromAsset(
         'packages/sliver_catalog/assets/shaders/freezing.frag',
@@ -61,7 +61,7 @@ class _FreezeSliverState extends State<FreezeSliver> {
       final image = await decodeImageFromList(list);
       shader.setImageSampler(0, image);
 
-      return shader;
+      return DefaultLeavingViewportShader(shader: shader);
 
       // Any problem but not specific leads to failure using the shader.
       // ignore: avoid_catches_without_on_clauses

@@ -22,7 +22,7 @@ class BloodSliver extends StatefulWidget {
 }
 
 class _BloodSliverState extends State<BloodSliver> {
-  late final Future<ui.FragmentShader?> _shaderFuture;
+  late final Future<DefaultLeavingViewportShader?> _shaderFuture;
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _BloodSliverState extends State<BloodSliver> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<ui.FragmentShader?>(
+    return FutureBuilder<DefaultLeavingViewportShader?>(
       future: _shaderFuture,
       builder: (context, snapshot) {
         final shader = snapshot.data;
@@ -48,14 +48,14 @@ class _BloodSliverState extends State<BloodSliver> {
     );
   }
 
-  Future<ui.FragmentShader?> _initShader() async {
+  Future<DefaultLeavingViewportShader?> _initShader() async {
     try {
       final program = await ui.FragmentProgram.fromAsset(
         'packages/sliver_catalog/assets/shaders/blood.frag',
       );
       final shader = program.fragmentShader();
-      
-      return shader;
+
+      return DefaultLeavingViewportShader(shader: shader);
 
       // Any problem but not specific leads to failure using the shader.
       // ignore: avoid_catches_without_on_clauses

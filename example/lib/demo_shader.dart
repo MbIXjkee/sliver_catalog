@@ -58,7 +58,7 @@ class _DemoShaderScreenState extends State<DemoShaderScreen> {
                 builder: (context, snapshot) {
                   final shader = snapshot.data;
 
-                  return LeavingViewportShaderSliver(
+                  return LeavingViewportShaderSliver.fromFragmentShader(
                     shader: shader,
                     child: ContentExample(
                       url: url,

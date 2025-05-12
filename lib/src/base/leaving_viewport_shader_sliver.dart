@@ -3,17 +3,54 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-/// A base implementation of the sliver that applies a [shader] on top of the
-/// child during the leaving of the visual part of the viewport.
-///
-/// Shader is a [ui.FragmentShader] which should operate with
-/// the following params:
+/// An interface abstraction over FragmentShader to be used with the
+/// [LeavingViewportShaderSliver].
+abstract interface class LeavingViewportShader {
+  /// The shader to apply to the child.
+  ui.FragmentShader get shader;
+
+  /// Sets up the shader params.
+  void tuneValue({
+    required Size childSize,
+    required Offset paintOffset,
+    required double progress,
+  });
+}
+
+/// A default implementation of the [LeavingViewportShader] which operates
+/// with a [ui.FragmentShader] following params order:
 /// uniform vec2 uSize - size of the child;
 /// uniform vec2 uOffset - offset of the child in canvas;
 /// uniform float uProgress - leaving progress;
+class DefaultLeavingViewportShader implements LeavingViewportShader {
+  final ui.FragmentShader _shader;
+
+  DefaultLeavingViewportShader({required ui.FragmentShader shader})
+      : _shader = shader;
+
+  @override
+  ui.FragmentShader get shader => _shader;
+
+  @override
+  void tuneValue({
+    required Size childSize,
+    required Offset paintOffset,
+    required double progress,
+  }) {
+    _shader
+      ..setFloat(0, childSize.width)
+      ..setFloat(1, childSize.height)
+      ..setFloat(2, paintOffset.dx)
+      ..setFloat(3, paintOffset.dy)
+      ..setFloat(4, progress);
+  }
+}
+
+/// A sliver that applies a [shader] on top of the child during the leaving
+/// of the visual part of the viewport.
 class LeavingViewportShaderSliver extends SingleChildRenderObjectWidget {
   /// The shader to apply to the child.
-  final ui.FragmentShader? shader;
+  final LeavingViewportShader? shader;
 
   /// Creates an instance of [LeavingViewportShaderSliver].
   const LeavingViewportShaderSliver({
@@ -21,6 +58,16 @@ class LeavingViewportShaderSliver extends SingleChildRenderObjectWidget {
     required Widget super.child,
     required this.shader,
   });
+
+  /// Creates an instance of [LeavingViewportShaderSliver] using
+  /// an instance of FragmentShader.
+  LeavingViewportShaderSliver.fromFragmentShader({
+    super.key,
+    required Widget super.child,
+    required ui.FragmentShader? shader,
+  }) : shader = shader != null
+            ? DefaultLeavingViewportShader(shader: shader)
+            : null;
 
   @override
   RenderObject createRenderObject(BuildContext context) {
@@ -38,11 +85,11 @@ class LeavingViewportShaderSliver extends SingleChildRenderObjectWidget {
 
 final class LeavingViewportShaderRenderSliver extends RenderSliver
     with RenderObjectWithChildMixin<RenderBox>, RenderSliverHelpers {
-  ui.FragmentShader? _shader;
+  LeavingViewportShader? _shader;
   double _progress = 0;
 
-  ui.FragmentShader? get shader => _shader;
-  set shader(ui.FragmentShader? value) {
+  LeavingViewportShader? get shader => _shader;
+  set shader(LeavingViewportShader? value) {
     if (_shader == value) {
       return;
     }
@@ -51,7 +98,7 @@ final class LeavingViewportShaderRenderSliver extends RenderSliver
   }
 
   LeavingViewportShaderRenderSliver({
-    required ui.FragmentShader? shader,
+    required LeavingViewportShader? shader,
   }) : _shader = shader;
 
   @override
@@ -116,9 +163,9 @@ final class LeavingViewportShaderRenderSliver extends RenderSliver
       final paintChildOffset = offset + childParentData.paintOffset;
 
       context.paintChild(child!, paintChildOffset);
-      final tunedShader = shader;
+      final tuningShader = shader;
 
-      if (tunedShader != null && _progress > 0) {
+      if (tuningShader != null && _progress > 0) {
         final childSize = child!.size;
         final rect = Rect.fromLTWH(
           paintChildOffset.dx,
@@ -127,14 +174,13 @@ final class LeavingViewportShaderRenderSliver extends RenderSliver
           childSize.height,
         );
 
-        tunedShader
-          ..setFloat(0, childSize.width)
-          ..setFloat(1, childSize.height)
-          ..setFloat(2, paintChildOffset.dx)
-          ..setFloat(3, paintChildOffset.dy)
-          ..setFloat(4, _progress);
+        tuningShader.tuneValue(
+          childSize: childSize,
+          paintOffset: paintChildOffset,
+          progress: _progress,
+        );
 
-        final paint = Paint()..shader = tunedShader;
+        final paint = Paint()..shader = tuningShader.shader;
         context.canvas.drawRect(rect, paint);
       }
     }
