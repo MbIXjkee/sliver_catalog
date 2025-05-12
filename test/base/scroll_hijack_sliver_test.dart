@@ -61,11 +61,19 @@ void main() {
 
       Future<void> scrollTo(double position, WidgetTester tester) async {
         controller.jumpTo(position);
-        // first time for handling position by render.
-        await tester.pump();
-        // second time for updating the UI next frame.
-        await tester.pump();
+        await tester.pumpAndSettle();
       }
+
+      testWidgets(
+        'should not generate unnecessary frames',
+        (tester) async {
+          await tester.pumpWidget(createTestWidget());
+
+          // This is quite a primitive way to test it, but does work.
+          // Should not throw timeout when nothing happen.
+          await tester.pumpAndSettle();
+        },
+      );
 
       testWidgets(
         'Initial consumingProgress is zero',
