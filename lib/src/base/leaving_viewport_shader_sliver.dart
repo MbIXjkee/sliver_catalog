@@ -5,11 +5,22 @@ import 'package:flutter/rendering.dart';
 
 /// An interface abstraction over FragmentShader to be used with the
 /// [LeavingViewportShaderSliver].
+///
+/// Implementers should supply the shader instance and properly update its
+/// uniform parameters in [tuneValue] method.
 abstract interface class LeavingViewportShader {
-  /// The shader to apply to the child.
+  /// Returns the active [ui.FragmentShader] that should be applied
+  /// over the child.
   ui.FragmentShader get shader;
 
-  /// Sets up the shader params.
+  /// Updates the shader's uniforms based on the child's size, its
+  /// paint offset in the canvas, and effect applying progress.
+  ///
+  /// - [childSize]: The size of the sliver's child widget.
+  /// - [paintOffset]: The top-left offset at which the child is painted.
+  /// - [progress]: A value between 0.0 and 1.0 indicating the progress of
+  /// the applying effect. 0.0 means there is no effect applied, while 1.0 means
+  /// the effect is fully applied.
   void tuneValue({
     required Size childSize,
     required Offset paintOffset,
@@ -18,10 +29,11 @@ abstract interface class LeavingViewportShader {
 }
 
 /// A default implementation of the [LeavingViewportShader] which operates
-/// with a [ui.FragmentShader] following params order:
+/// with a [ui.FragmentShader] following the uniform ordering:
+///
 /// uniform vec2 uSize - size of the child;
 /// uniform vec2 uOffset - offset of the child in canvas;
-/// uniform float uProgress - leaving progress;
+/// uniform float uProgress - leaving progress/effect applying progress;
 class DefaultLeavingViewportShader implements LeavingViewportShader {
   final ui.FragmentShader _shader;
 
@@ -46,10 +58,18 @@ class DefaultLeavingViewportShader implements LeavingViewportShader {
   }
 }
 
-/// A sliver that applies a [shader] on top of the child during the leaving
-/// of the visual part of the viewport.
+/// A sliver widget that renders its child normally, then overlays a
+/// fragment shader effect as the child scrolls out of the viewport.
+///
+/// Use [LeavingViewportShaderSliver.fromFragmentShader] for a shorthand
+/// when you have a [ui.FragmentShader] matching the default uniforms ordering.
+///
+/// See also:
+/// - [LeavingViewportShader] a contract for implementing custom ordering of
+/// uniforms.
+/// - [DefaultLeavingViewportShader] for a default shader implementation.
 class LeavingViewportShaderSliver extends SingleChildRenderObjectWidget {
-  /// The shader to apply to the child.
+  /// The shader to be applied over the child.
   final LeavingViewportShader? shader;
 
   /// Creates an instance of [LeavingViewportShaderSliver].
@@ -59,8 +79,10 @@ class LeavingViewportShaderSliver extends SingleChildRenderObjectWidget {
     required this.shader,
   });
 
-  /// Creates an instance of [LeavingViewportShaderSliver] using
-  /// an instance of FragmentShader.
+  /// Convenience constructor of [LeavingViewportShaderSliver] that accepts 
+  /// a raw [ui.FragmentShader].
+  ///
+  /// Wraps the provided shader in a [DefaultLeavingViewportShader].
   LeavingViewportShaderSliver.fromFragmentShader({
     super.key,
     required Widget super.child,
@@ -71,19 +93,21 @@ class LeavingViewportShaderSliver extends SingleChildRenderObjectWidget {
 
   @override
   RenderObject createRenderObject(BuildContext context) {
-    return LeavingViewportShaderRenderSliver(shader: shader);
+    return _LeavingViewportShaderRenderSliver(shader: shader);
   }
 
   @override
   void updateRenderObject(
     BuildContext context,
-    LeavingViewportShaderRenderSliver renderObject,
+    // An internal method, there is no public exposure of it.
+    // ignore: library_private_types_in_public_api
+    _LeavingViewportShaderRenderSliver renderObject,
   ) {
     renderObject.shader = shader;
   }
 }
 
-final class LeavingViewportShaderRenderSliver extends RenderSliver
+final class _LeavingViewportShaderRenderSliver extends RenderSliver
     with RenderObjectWithChildMixin<RenderBox>, RenderSliverHelpers {
   LeavingViewportShader? _shader;
   double _progress = 0;
@@ -97,7 +121,7 @@ final class LeavingViewportShaderRenderSliver extends RenderSliver
     markNeedsPaint();
   }
 
-  LeavingViewportShaderRenderSliver({
+  _LeavingViewportShaderRenderSliver({
     required LeavingViewportShader? shader,
   }) : _shader = shader;
 
