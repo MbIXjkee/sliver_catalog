@@ -69,6 +69,9 @@ class ScrollHijackSliver extends StatefulWidget {
   /// The size of the space that should be consumed.
   final double consumingSpaceSize;
 
+  /// Describes how the progress is calculated.
+  final ScrollHijackProgressBehavior progressBehavior;
+
   /// A builder function that builds the child subtree.
   final Widget Function(
     BuildContext context,
@@ -79,6 +82,7 @@ class ScrollHijackSliver extends StatefulWidget {
     super.key,
     required this.consumingSpaceSize,
     required this.builder,
+    this.progressBehavior = ScrollHijackProgressBehavior.onlyConsumingSpace,
   }) : assert(
           consumingSpaceSize > 0,
           // ignore: lines_longer_than_80_chars
@@ -94,7 +98,6 @@ class _ScrollHijackSliverState extends State<ScrollHijackSliver>
   final ValueNotifier<double> _consumingProgress = ValueNotifier(0.0);
   late final Ticker _ticker;
 
-  double _lastHandled = 0;
   double _toHandle = 0;
 
   @override
@@ -119,6 +122,7 @@ class _ScrollHijackSliverState extends State<ScrollHijackSliver>
   Widget build(BuildContext context) {
     return _HijackSliver(
       consumingSpaceSize: widget.consumingSpaceSize,
+      progressBehavior: widget.progressBehavior,
       onProgressChanged: _onProgressChanged,
       child: widget.builder(
         context,
@@ -131,7 +135,7 @@ class _ScrollHijackSliverState extends State<ScrollHijackSliver>
   void _onProgressChanged(double newProgress) {
     _toHandle = newProgress;
 
-    if (_toHandle != _lastHandled) {
+    if (_toHandle != _consumingProgress.value) {
       if (!_ticker.isActive) {
         _ticker.start();
       }
@@ -140,14 +144,8 @@ class _ScrollHijackSliverState extends State<ScrollHijackSliver>
     }
   }
 
-  void _onTick(Duration elapsed) {
-    final last = _lastHandled;
-    final current = _toHandle;
-    if (last != current) {
-      _consumingProgress.value =
-          clampDouble(current / widget.consumingSpaceSize, 0.0, 1.0);
-      _lastHandled = current;
-    }
+  void _onTick(Duration _) {
+    _consumingProgress.value = _toHandle;
 
     _ticker.stop();
   }
@@ -155,10 +153,12 @@ class _ScrollHijackSliverState extends State<ScrollHijackSliver>
 
 class _HijackSliver extends SingleChildRenderObjectWidget {
   final double consumingSpaceSize;
+  final ScrollHijackProgressBehavior progressBehavior;
   final void Function(double progress) onProgressChanged;
 
   const _HijackSliver({
     required this.consumingSpaceSize,
+    required this.progressBehavior,
     required this.onProgressChanged,
     required super.child,
   });
@@ -167,6 +167,7 @@ class _HijackSliver extends SingleChildRenderObjectWidget {
   RenderObject createRenderObject(BuildContext context) {
     return _HijackRenderSliver(
       consumingProgress: consumingSpaceSize,
+      progressBehavior: progressBehavior,
       onProgressChanged: onProgressChanged,
     );
   }
@@ -178,6 +179,7 @@ class _HijackSliver extends SingleChildRenderObjectWidget {
   ) {
     renderObject
       ..consumingProgress = consumingSpaceSize
+      ..progressBehavior = progressBehavior
       ..onProgressChanged = onProgressChanged;
   }
 }
@@ -185,6 +187,7 @@ class _HijackSliver extends SingleChildRenderObjectWidget {
 class _HijackRenderSliver extends RenderSliver
     with RenderObjectWithChildMixin<RenderBox>, RenderSliverHelpers {
   double _consumingProgress;
+  ScrollHijackProgressBehavior _progressBehavior;
   void Function(double progress) _onProgressChanged;
 
   bool get _isConsumingSpace => constraints.scrollOffset <= _consumingProgress;
@@ -201,6 +204,15 @@ class _HijackRenderSliver extends RenderSliver
     markNeedsLayout();
   }
 
+  ScrollHijackProgressBehavior get progressBehavior => _progressBehavior;
+  set progressBehavior(ScrollHijackProgressBehavior value) {
+    if (_progressBehavior == value) {
+      return;
+    }
+    _progressBehavior = value;
+    markNeedsLayout();
+  }
+
   void Function(double progress) get onProgressChanged => _onProgressChanged;
   set onProgressChanged(void Function(double progress) value) {
     if (_onProgressChanged == value) {
@@ -212,8 +224,10 @@ class _HijackRenderSliver extends RenderSliver
 
   _HijackRenderSliver({
     required double consumingProgress,
+    required ScrollHijackProgressBehavior progressBehavior,
     required void Function(double progress) onProgressChanged,
   })  : _consumingProgress = consumingProgress,
+        _progressBehavior = progressBehavior,
         _onProgressChanged = onProgressChanged;
 
   @override
@@ -395,12 +409,13 @@ class _HijackRenderSliver extends RenderSliver
   }
 
   void _updateConsumingProgress() {
-    onProgressChanged(
-      clampDouble(
-        constraints.scrollOffset,
-        0,
-        consumingProgress,
-      ),
-    );
+    final scrollOffset = constraints.scrollOffset;
+    final totalExtent =
+        _progressBehavior == ScrollHijackProgressBehavior.onlyConsumingSpace
+            ? _consumingProgress
+            : geometry!.scrollExtent;
+    final progress = clampDouble(scrollOffset / totalExtent, 0.0, 1.0);
+
+    onProgressChanged(progress);
   }
 }
