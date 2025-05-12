@@ -3,6 +3,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 
+/// Defines the behavior for calculating progress in [ScrollHijackSliver].
+///
+/// This determines which parts of the sliver's layout and scroll offset
+/// are considered when computing the normalized progress value
+/// (from 0.0 to 1.0).
+enum ScrollHijackProgressBehavior {
+  /// Progress is calculated only based on how much of the scroll extent
+  /// has been consumed by the sliver relative to consumingSpaceSize.
+  ///
+  /// Treated as:
+  /// `progress = consumedExtent / consumingSpaceSize`
+  onlyConsumingSpace,
+
+  /// Progress is calculated based on the consumed extent and how much of
+  /// the sliver has already been scrolled past (outside the viewport).
+  ///
+  /// Treated as:
+  /// `progress = (consumedExtent + scrolledOutExtent) /
+  /// (consumingSpaceSize + childExtent)`
+  consumingSpaceAndMoving,
+}
+
 /// A custom sliver widget that consumes a specified amount of scrollable space
 /// before allowing its child to start scrolling. This widget is useful for
 /// creating custom content animation based on scroll progress.
