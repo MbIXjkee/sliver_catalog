@@ -12,12 +12,16 @@ const double _kQuarterTurnsInRadians = math.pi / 2.0;
 /// [maxAngle] radians around the anchor point.
 /// Before this moment, rotation is proportional to the part of the widget that
 /// has already left the screen.
-/// 
+///
 /// See also:
 /// [SingleChildRenderObjectWidget] a base class implements a transform applied
 /// to the child based on the progress of the leaving.
 class SpinnerSliver extends SingleChildRenderObjectWidget {
   /// The side of the rotation point.
+  /// For the vertical scrolling, it means literally left or right side,
+  /// unrelated to the scroll growth direction.
+  /// For the horizontal scrolling, it means the top or bottom side,
+  /// depending on the reverseness of the scroll direction.
   final SpinnerAnchorSide anchorSide;
 
   /// The maximum angle of rotation in radians.
@@ -81,7 +85,6 @@ final class SpinnerRenderSliver extends LeavingViewportTransformedRenderSliver {
   @override
   Matrix4? performTransform(Size childSize, double leavingProgress) {
     final angle = _maxAngle * leavingProgress;
-    final rotation = angle * (anchorSide == SpinnerAnchorSide.left ? -1 : 1);
 
     late final Size size;
     if (constraints.axis == Axis.horizontal) {
@@ -100,7 +103,7 @@ final class SpinnerRenderSliver extends LeavingViewportTransformedRenderSliver {
 
     return Matrix4.identity()
       ..translate(translation.dx, translation.dy)
-      ..rotateZ(_isReversed ? -rotation : rotation)
+      ..rotateZ(_calculateRotation(angle))
       ..translate(-translation.dx, -translation.dy);
   }
 
@@ -138,9 +141,15 @@ final class SpinnerRenderSliver extends LeavingViewportTransformedRenderSliver {
   Offset _calculateTranslation(Size size) {
     late final FractionalOffset offset;
     if (constraints.axis == Axis.horizontal) {
-      offset = _anchorSide == SpinnerAnchorSide.left
-          ? FractionalOffset.bottomRight
-          : FractionalOffset.topRight;
+      if (_isReversed) {
+        offset = _anchorSide == SpinnerAnchorSide.left
+            ? FractionalOffset.topLeft
+            : FractionalOffset.bottomLeft;
+      } else {
+        offset = _anchorSide == SpinnerAnchorSide.left
+            ? FractionalOffset.bottomRight
+            : FractionalOffset.topRight;
+      }
     } else {
       if (_isReversed) {
         offset = _anchorSide == SpinnerAnchorSide.left
@@ -154,6 +163,21 @@ final class SpinnerRenderSliver extends LeavingViewportTransformedRenderSliver {
     }
 
     return offset.alongSize(size);
+  }
+
+  double _calculateRotation(double angle) {
+    final int sideMultiplicator;
+    final int directionMultiplicator;
+
+    if (constraints.axis == Axis.horizontal) {
+      sideMultiplicator = anchorSide == SpinnerAnchorSide.left ? -1 : 1;
+      directionMultiplicator = 1;
+    } else {
+      sideMultiplicator = anchorSide == SpinnerAnchorSide.left ? -1 : 1;
+      directionMultiplicator = _isReversed ? -1 : 1;
+    }
+
+    return sideMultiplicator * directionMultiplicator * angle;
   }
 }
 
