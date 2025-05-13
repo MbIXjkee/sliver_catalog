@@ -8,6 +8,9 @@ uniform sampler2D uFreezeTexture;
 
 out vec4 fragColor;
 
+// Hard-code the texture size, since it is always the same one.
+const vec2 kTexSize = vec2(543.0, 360.0);
+
 // Easing function to apply a dynamic to the effect - fast at the beginning and slow at the end.
 float easeOutQuad(float x) {
     return 1.0 - (1.0 - x) * (1.0 - x);
@@ -16,11 +19,25 @@ float easeOutQuad(float x) {
 void main() {
     // Local coordinate of the fragment -> global - offset.
     vec2 xy = FlutterFragCoord().xy - uOffset;
-    // Local coordinate relative the texture.
-    vec2 uv = xy / uSize;
+
+    // Calculate the UV coordinates.
+    vec2 uvRect = xy / uSize;
+
+    // Calculate scaleX/Y - how many times the texture “zooms” to fill the rect
+    float scaleX = uSize.x / kTexSize.x;
+    float scaleY = uSize.y / kTexSize.y;
+    float scale = max(scaleX, scaleY);
+
+    // Calculate factors for both axes and the offset to center the texture.
+    vec2 factor = vec2(scaleX, scaleY) / scale;
+    vec2 offset = (vec2(1.0) - factor) * 0.5;
+
+    // Calculate the UV coordinates for the texture.
+    vec2 uvCover = uvRect * factor + offset;
+    uvCover = clamp(uvCover, 0.0, 1.0);
 
     // Texture value in the coordinate.
-    vec4 freezeTex = texture(uFreezeTexture, uv);
+    vec4 freezeTex = texture(uFreezeTexture, uvCover);
     // Luminance of the texture.
     float mask = dot(freezeTex.rgb, vec3(0.299, 0.587, 0.114));
 
