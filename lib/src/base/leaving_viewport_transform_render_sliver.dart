@@ -146,16 +146,26 @@ abstract class LeavingViewportTransformedRenderSliver
       final inverse = Matrix4.tryInvert(transform);
       if (inverse == null) return false;
 
+      final isVertical = constraints.axis == Axis.vertical;
+      final logicalOffset = isVertical
+          ? Offset(crossAxisPosition, mainAxisPosition)
+          : Offset(mainAxisPosition, crossAxisPosition);
+
       final localOffset = MatrixUtils.transformPoint(
         inverse,
-        Offset(crossAxisPosition, mainAxisPosition),
+        logicalOffset,
       );
+
+      final childMainAxisPosition =
+          isVertical ? localOffset.dy : localOffset.dx;
+      final childCrossAxisPosition =
+          isVertical ? localOffset.dx : localOffset.dy;
 
       return hitTestBoxChild(
         BoxHitTestResult.wrap(result),
         child!,
-        mainAxisPosition: localOffset.dy,
-        crossAxisPosition: localOffset.dx,
+        mainAxisPosition: childMainAxisPosition,
+        crossAxisPosition: childCrossAxisPosition,
       );
     }
 
