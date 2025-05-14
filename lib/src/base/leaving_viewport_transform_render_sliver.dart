@@ -21,8 +21,13 @@ abstract class LeavingViewportTransformedRenderSliver
   final _transformLayer = LayerHandle<TransformLayer>();
   Matrix4? _paintTransform;
 
+  @visibleForTesting
   @protected
   Matrix4? get paintTransform => _paintTransform;
+
+  @visibleForTesting
+  // ignore: use_setters_to_change_properties
+  void setTestPaintTransform(Matrix4? value) => _paintTransform = value;
 
   /// A function that defines the transformation applied to the child.
   Matrix4? performTransform(Size childSize, double leavingProgress);
