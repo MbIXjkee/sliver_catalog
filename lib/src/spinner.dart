@@ -108,51 +108,46 @@ final class SpinnerRenderSliver extends LeavingViewportTransformedRenderSliver {
   }
 
   @override
-  bool performSpecificHitTestChildren(
+  bool? performSpecificHitTestChildren(
     SliverHitTestResult result, {
     required double mainAxisPosition,
     required double crossAxisPosition,
   }) {
     assert(geometry!.hitTestExtent > 0.0);
     if (child != null) {
-      // Since we deal with the rotation, the default matrix inverse doesn't
-      // work as expected in some scroll conditions, like for example reverse
-      // scrolling.
-      // We need to match local offset inside the child, which based always
-      // at top left corner with point from which mainAxisPosition and
-      // crossAxisPosition a calculated.
-      final Offset logicalOffset;
-      if (constraints.axis == Axis.vertical) {
-        if (_isReversed) {
+      // Direct scrolling cases work good with default testing of super class.
+      if (!_isReversed) {
+        return null;
+      } else {
+        // Since we deal with the rotation, the default matrix inverse doesn't
+        // work as expected in reverse scrolling.
+        // We need to adjust the point of hit, taking into account that
+        // a local offset inside the child is always related to the top left
+        // corner, while mainAxisPosition and crossAxisPosition are calculated
+        // from the 0.0 of the viewport where the sliver is placed.
+        final Offset logicalOffset;
+        if (constraints.axis == Axis.vertical) {
           // Local coordinates in the top left corner,
           // point of offset calculation at the bottom left corner.
           final correctedMainOffset = geometry!.paintExtent - mainAxisPosition;
 
           logicalOffset = Offset(crossAxisPosition, correctedMainOffset);
         } else {
-          // point are matched, just put values in correct order.
-          logicalOffset = Offset(crossAxisPosition, mainAxisPosition);
-        }
-      } else {
-        if (_isReversed) {
           // Local coordinates in the top left corner,
           // point of offset calculation at the top right corner.
           final correctedMainOffset = geometry!.paintExtent - mainAxisPosition;
 
           logicalOffset = Offset(correctedMainOffset, crossAxisPosition);
-        } else {
-          // point are matched, just put values in correct order.
-          logicalOffset = Offset(mainAxisPosition, crossAxisPosition);
         }
-      }
 
-      return BoxHitTestResult.wrap(result).addWithPaintTransform(
-        transform: paintTransform,
-        position: logicalOffset,
-        hitTest: (result, position) {
-          return child!.hitTest(result, position: position);
-        },
-      );
+        return BoxHitTestResult.wrap(result).addWithPaintTransform(
+          transform: paintTransform,
+          position: logicalOffset,
+          hitTest: (result, position) {
+            return child!.hitTest(result, position: position);
+          },
+        );
+      }
     }
     return false;
   }
