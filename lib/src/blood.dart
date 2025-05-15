@@ -1,7 +1,6 @@
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 import 'package:sliver_catalog/sliver_catalog.dart';
+import 'package:sliver_catalog/src/utils/shader_storage.dart';
 
 /// A widget that applies a blood covering effect to the content of a sliver
 /// using a predefined shader effect.
@@ -50,10 +49,9 @@ class _BloodSliverState extends State<BloodSliver> {
 
   Future<DefaultLeavingViewportShader?> _initShader() async {
     try {
-      final program = await ui.FragmentProgram.fromAsset(
-        'packages/sliver_catalog/assets/shaders/blood.frag',
+      final shader = await ShaderStorage.instance.getShader(
+        SupportedShaders.blood,
       );
-      final shader = program.fragmentShader();
 
       return DefaultLeavingViewportShader(shader: shader);
 
