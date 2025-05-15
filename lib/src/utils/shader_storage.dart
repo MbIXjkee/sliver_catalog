@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
+
 /// Enumerates predefined shaders supported by the package.
 enum SupportedShaders {
   blood('packages/sliver_catalog/assets/shaders/blood.frag'),
@@ -44,5 +46,13 @@ class ShaderStorage {
 
       return fp.fragmentShader();
     }
+  }
+
+  @visibleForTesting
+  void setProgramForTest(
+    SupportedShaders key,
+    FutureOr<ui.FragmentProgram> program,
+  ) {
+    _register[key] = program;
   }
 }
