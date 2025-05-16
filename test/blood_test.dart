@@ -9,7 +9,7 @@ void main() {
   group('BloodSliver', () {
     testWidgets('applies shader when it is loaded', (tester) async {
       final programLoading =
-          ui.FragmentProgram.fromAsset('assets/shaders/template.frag');
+          ui.FragmentProgram.fromAsset('assets/shaders/blood.frag');
 
       ShaderStorage.instance.setProgramForTest(
         SupportedShaders.blood,
