@@ -24,5 +24,3 @@ flutter:
     - assets/shaders/freezing.frag
     - assets/shaders/blood.frag
     - assets/shaders/template.frag
-  assets:
-    - assets/textures/

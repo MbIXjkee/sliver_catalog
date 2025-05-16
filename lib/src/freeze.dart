@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:sliver_catalog/sliver_catalog.dart';
 import 'package:sliver_catalog/src/utils/shader_storage.dart';
+import 'package:sliver_catalog/src/utils/texture_storage.dart';
 
 /// A widget that freezes the content of a sliver using
 /// a predefined in the package shader effect.
@@ -54,10 +54,7 @@ class _FreezeSliverState extends State<FreezeSliver> {
         SupportedShaders.freezing,
       );
 
-      final byteData = await rootBundle
-          .load('packages/sliver_catalog/assets/textures/texture.png');
-      final list = Uint8List.view(byteData.buffer);
-      final image = await decodeImageFromList(list);
+      final image = await TextureStorage.instance.getFreezeTexture();
       shader.setImageSampler(0, image);
 
       return DefaultLeavingViewportShader(shader: shader);
