@@ -7,6 +7,8 @@ import 'package:sliver_catalog/src/utils/freeze_texture.dart';
 /// A utility class to manage and load textures.
 /// Localy caches the textures for prevent mass decoding the same image.
 class TextureStorage {
+  static const freezeTextureKey = 'freeze';
+
   static final TextureStorage _instance = TextureStorage._internal();
 
   final _register = <String, FutureOr<ui.Image>>{};
@@ -21,8 +23,7 @@ class TextureStorage {
 
   /// Returns a texture for freeze effect.
   Future<ui.Image> getFreezeTexture() async {
-    const key = 'freeze';
-    final loadingTexture = _register[key];
+    final loadingTexture = _register[freezeTextureKey];
 
     if (loadingTexture != null) {
       final texture = switch (loadingTexture) {
@@ -33,12 +34,20 @@ class TextureStorage {
       return texture;
     } else {
       final decodingFuture = decodeImageFromList(freezeTexture);
-      _register[key] = decodingFuture;
+      _register[freezeTextureKey] = decodingFuture;
 
       final texture = await decodingFuture;
-      _register[key] = texture;
+      _register[freezeTextureKey] = texture;
 
       return texture;
     }
+  }
+
+  @visibleForTesting
+  void setTextureForTest(
+    String key,
+    FutureOr<ui.Image> texture,
+  ) {
+    _register[key] = texture;
   }
 }
