@@ -1,4 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sliver_catalog/sliver_catalog.dart';
 
@@ -69,5 +72,59 @@ void main() {
         expect(tester.takeException(), isNull);
       },
     );
+  });
+
+  group('SpinnerRenderSliver', () {
+    late SpinnerRenderSliver sliver;
+    late RenderBox child;
+
+    setUp(() {
+      child = RenderConstrainedBox(
+        additionalConstraints: BoxConstraints.tight(const Size(100, 100)),
+      )..parentData = SliverPhysicalParentData();
+
+      sliver = SpinnerRenderSliver(
+        anchorSide: SpinnerAnchorSide.left,
+      )..child = child;
+    });
+
+    group('initial properties should be set correctly', () {
+      const testCases = [
+        (anchorSide: SpinnerAnchorSide.left, maxAngle: math.pi / 2),
+        (anchorSide: SpinnerAnchorSide.left, maxAngle: math.pi / 3),
+        (anchorSide: SpinnerAnchorSide.left, maxAngle: math.pi / 6),
+        (anchorSide: SpinnerAnchorSide.right, maxAngle: math.pi / 2),
+        (anchorSide: SpinnerAnchorSide.right, maxAngle: math.pi / 3),
+        (anchorSide: SpinnerAnchorSide.right, maxAngle: math.pi / 6),
+      ];
+
+      for (final testCase in testCases) {
+        final (:anchorSide, :maxAngle) = testCase;
+
+        test('anchorSide: $anchorSide, maxAngle: $maxAngle', () {
+          final sliver = SpinnerRenderSliver(
+            anchorSide: anchorSide,
+            maxAngle: maxAngle,
+          );
+
+          expect(sliver.anchorSide, anchorSide);
+          expect(sliver.maxAngle, closeTo(maxAngle, 0.001));
+        });
+      }
+    });
+
+    test('anchorSide setter triggers layout', () {
+      sliver.anchorSide = SpinnerAnchorSide.right;
+      final isNeedLayout = sliver.debugNeedsLayout;
+
+      expect(isNeedLayout, isTrue);
+    });
+
+    test('maxAngle setter triggers layout', () {
+      sliver.maxAngle = 0.5;
+      final isNeedLayout = sliver.debugNeedsLayout;
+      
+      expect(isNeedLayout, isTrue);
+    });
   });
 }
