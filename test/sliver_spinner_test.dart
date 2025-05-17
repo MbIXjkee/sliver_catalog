@@ -3,69 +3,71 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sliver_catalog/sliver_catalog.dart';
 
 void main() {
-  testWidgets(
-    'Use spinner in scrollable should no exception',
-    (tester) async {
-      final widget = MaterialApp(
-        home: Scaffold(
-          body: CustomScrollView(
-            slivers: [
-              SpinnerSliver(
-                child: Container(
-                  height: 200,
+  group('SpinnerSliver', () {
+    testWidgets(
+      'Use spinner in scrollable should no exception',
+      (tester) async {
+        final widget = MaterialApp(
+          home: Scaffold(
+            body: CustomScrollView(
+              slivers: [
+                SpinnerSliver(
+                  child: Container(
+                    height: 200,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
+        );
 
-      expect(() => tester.pumpWidget(widget), returnsNormally);
-    },
-  );
+        expect(() => tester.pumpWidget(widget), returnsNormally);
+      },
+    );
 
-  testWidgets(
-    'Use spinner in no scrollable should throw exception',
-    (tester) async {
-      final widget = SpinnerSliver(
-        child: Container(),
-      );
+    testWidgets(
+      'Use spinner in no scrollable should throw exception',
+      (tester) async {
+        final widget = SpinnerSliver(
+          child: Container(),
+        );
 
-      await tester.pumpWidget(widget);
+        await tester.pumpWidget(widget);
 
-      expect(tester.takeException(), isInstanceOf<FlutterError>());
-    },
-  );
+        expect(tester.takeException(), isInstanceOf<FlutterError>());
+      },
+    );
 
-  testWidgets(
-    'Move spinner out of screen should not throw exception',
-    (tester) async {
-      final key = UniqueKey();
-      final widget = MaterialApp(
-        home: Scaffold(
-          body: CustomScrollView(
-            slivers: [
-              SpinnerSliver(
-                child: Container(
-                  key: key,
-                  height: 400,
+    testWidgets(
+      'Move spinner out of screen should not throw exception',
+      (tester) async {
+        final key = UniqueKey();
+        final widget = MaterialApp(
+          home: Scaffold(
+            body: CustomScrollView(
+              slivers: [
+                SpinnerSliver(
+                  child: Container(
+                    key: key,
+                    height: 400,
+                  ),
                 ),
-              ),
-              SliverToBoxAdapter(
-                child: Container(
-                  height: 1000,
+                SliverToBoxAdapter(
+                  child: Container(
+                    height: 1000,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.pumpWidget(widget);
-      await tester.drag(find.byKey(key), const Offset(0, 100));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(widget);
+        await tester.drag(find.byKey(key), const Offset(0, 100));
+        await tester.pumpAndSettle();
 
-      expect(tester.takeException(), isNull);
-    },
-  );
+        expect(tester.takeException(), isNull);
+      },
+    );
+  });
 }
