@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -129,34 +130,87 @@ void main() {
 
     group('performTransform should return correct result', () {
       final testCases = [
-        (scrollOffset: 0.0, expectedTransform: null),
-        (scrollOffset: 50.0, expectedTransform: Matrix4.identity()),
+        (
+          description: 'Vertical forward, left anchor, scrollOffset 0',
+          axisDirection: AxisDirection.down,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.right,
+          anchorSide: SpinnerAnchorSide.left,
+          maxAngle: 1.57,
+          scrollOffset: 0.0,
+          childConstraints: const BoxConstraints.tightFor(height: 100.0),
+          expectedRotation: null,
+        ),
+        (
+          description: 'Vertical forward, left anchor, scrollOffset 100',
+          axisDirection: AxisDirection.down,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.right,
+          anchorSide: SpinnerAnchorSide.left,
+          maxAngle: 1.57,
+          scrollOffset: 100.0,
+          childConstraints: const BoxConstraints.tightFor(height: 100.0),
+          expectedRotation: 1.57,
+        ),
       ];
 
       for (final testCase in testCases) {
-        final (:scrollOffset, :expectedTransform) = testCase;
+        final (
+          :description,
+          :axisDirection,
+          :growthDirection,
+          :crossAxisDirection,
+          :anchorSide,
+          :maxAngle,
+          :scrollOffset,
+          :childConstraints,
+          :expectedRotation
+        ) = testCase;
 
-        test('scrollOffset: $scrollOffset', () {
+        test(description, () {
           final constraints = SliverConstraints(
-            axisDirection: AxisDirection.down,
-            growthDirection: GrowthDirection.forward,
+            axisDirection: axisDirection,
+            growthDirection: growthDirection,
             userScrollDirection: ScrollDirection.idle,
             scrollOffset: scrollOffset,
             precedingScrollExtent: 0.0,
             overlap: 0.0,
-            remainingPaintExtent: 200.0,
+            remainingPaintExtent: 600.0,
             crossAxisExtent: 300.0,
             crossAxisDirection: AxisDirection.right,
-            viewportMainAxisExtent: 200.0,
-            remainingCacheExtent: 200.0,
-            cacheOrigin: 0.0,
+            viewportMainAxisExtent: 600.0,
+            remainingCacheExtent: 850.0,
+            cacheOrigin: clampDouble(-scrollOffset, 0, 250),
           );
+          final sliver = SpinnerRenderSliver(
+            anchorSide: anchorSide,
+            maxAngle: maxAngle,
+          );
+          final child = RenderConstrainedBox(
+            additionalConstraints: childConstraints,
+          )..parentData = SliverPhysicalParentData();
 
-          sliver.layout(constraints);
+          sliver
+            ..child = child
+            ..layout(constraints);
 
-          expect(sliver.paintTransform, expectedTransform);
+          final paintTransform = sliver.paintTransform;
+          if (expectedRotation == null) {
+            expect(paintTransform, isNull);
+          } else {
+            expect(paintTransform, isNotNull);
+            expect(paintTransform, isA<Matrix4>());
+            expect(
+              _getActualRotationByMatrix(paintTransform!),
+              closeTo(expectedRotation, 0.001),
+            );
+          }
         });
       }
     });
   });
+}
+
+double _getActualRotationByMatrix(Matrix4 matrix) {
+  return 0.0;
 }
