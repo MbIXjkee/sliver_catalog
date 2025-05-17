@@ -80,7 +80,7 @@ void main() {
 
     setUp(() {
       child = RenderConstrainedBox(
-        additionalConstraints: BoxConstraints.tight(const Size(100, 100)),
+        additionalConstraints: const BoxConstraints.expand(height: 100),
       )..parentData = SliverPhysicalParentData();
 
       sliver = SpinnerRenderSliver(
@@ -123,8 +123,40 @@ void main() {
     test('maxAngle setter triggers layout', () {
       sliver.maxAngle = 0.5;
       final isNeedLayout = sliver.debugNeedsLayout;
-      
+
       expect(isNeedLayout, isTrue);
+    });
+
+    group('performTransform should return correct result', () {
+      final testCases = [
+        (scrollOffset: 0.0, expectedTransform: null),
+        (scrollOffset: 50.0, expectedTransform: Matrix4.identity()),
+      ];
+
+      for (final testCase in testCases) {
+        final (:scrollOffset, :expectedTransform) = testCase;
+
+        test('scrollOffset: $scrollOffset', () {
+          final constraints = SliverConstraints(
+            axisDirection: AxisDirection.down,
+            growthDirection: GrowthDirection.forward,
+            userScrollDirection: ScrollDirection.idle,
+            scrollOffset: scrollOffset,
+            precedingScrollExtent: 0.0,
+            overlap: 0.0,
+            remainingPaintExtent: 200.0,
+            crossAxisExtent: 300.0,
+            crossAxisDirection: AxisDirection.right,
+            viewportMainAxisExtent: 200.0,
+            remainingCacheExtent: 200.0,
+            cacheOrigin: 0.0,
+          );
+
+          sliver.layout(constraints);
+
+          expect(sliver.paintTransform, expectedTransform);
+        });
+      }
     });
   });
 }
