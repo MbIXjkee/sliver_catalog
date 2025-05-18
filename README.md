@@ -1,8 +1,5 @@
-# Sliver Catalog
-
-###
 <p align="center">
-    <img src="https://i.ibb.co/ZHYQHkh/sliver-catalog-logo.png" alt="Sliver Catalog Logo" height="180">
+    <img src="https://i.ibb.co/rhz9j85/Sliver-Catalog.png" alt="Sliver Catalog Logo" height="180">
 </p>
 
 ###
