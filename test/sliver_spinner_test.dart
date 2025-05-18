@@ -1,3 +1,5 @@
+// ignore_for_file: lines_longer_than_80_chars
+
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
@@ -464,8 +466,77 @@ void main() {
 
         expect(result, isNull);
       });
+
+      group('should pass decision over to the child', () {
+        const testCases = [
+          (
+            childAnswer: true,
+            expectation: isTrue,
+          ),
+          (
+            childAnswer: false,
+            expectation: isFalse,
+          ),
+        ];
+
+        for (final testCase in testCases) {
+          final (:childAnswer, :expectation) = testCase;
+
+          test(
+            'case: $childAnswer',
+            () {
+              const constraints = SliverConstraints(
+                axisDirection: AxisDirection.down,
+                growthDirection: GrowthDirection.reverse,
+                userScrollDirection: ScrollDirection.idle,
+                scrollOffset: 0.0,
+                precedingScrollExtent: 0.0,
+                overlap: 0.0,
+                remainingPaintExtent: 600.0,
+                crossAxisExtent: 300.0,
+                crossAxisDirection: AxisDirection.right,
+                viewportMainAxisExtent: 600.0,
+                remainingCacheExtent: 850.0,
+                cacheOrigin: 0,
+              );
+              final hitTestBox = _HitTestBox()..testHitTest = childAnswer;
+              sliver
+                ..child = hitTestBox
+                ..layout(constraints);
+
+              final result = sliver.performSpecificHitTestChildren(
+                SliverHitTestResult(),
+                mainAxisPosition: 10,
+                crossAxisPosition: 10,
+              );
+              expect(result, expectation);
+            },
+          );
+        }
+      });
     });
   });
+}
+
+class _HitTestBox extends RenderBox {
+  bool _hittestResult = false;
+  Offset? triedPosition;
+
+  // ignore: avoid_setters_without_getters
+  set testHitTest(bool value) {
+    _hittestResult = value;
+  }
+
+  @override
+  bool hitTest(BoxHitTestResult result, {required Offset position}) {
+    triedPosition = position;
+    return _hittestResult;
+  }
+
+  @override
+  void performLayout() {
+    size = constraints.biggest;
+  }
 }
 
 double _getActualRotationByMatrix(Matrix4 matrix) {
