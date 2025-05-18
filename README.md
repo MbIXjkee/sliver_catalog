@@ -23,12 +23,12 @@ A collection of experimental and creative slivers for Flutter. Extend your scrol
 
 ## Overview
 
-Sliver Catalog provides a set of advanced and experimental slivers for Flutter, enabling developers to create unique and visually engaging scroll effects. The package includes both basic slivers as platform for creating effects and specific implementations providing ready-to-use effects.
+Sliver Catalog provides a set of advanced and experimental slivers for Flutter, enabling developers to create unique, visually engaging scroll effects. The package includes basic slivers as a platform for creating effects and specific implementations that provide ready-to-use effects.
 
 ### Basics
 - **ScrollHijackSliver**: A sliver that consumes a specified amount of scrollable space before allowing its child to start scrolling.
 - **LeavingViewportShaderSliver**: Applies a shader on top of the child while it leaves the viewport.
-- **LeavingViewportTransformedRenderSliver**: a render object that applies a transformation to the child while it leaves the viewport.
+- **LeavingViewportTransformedRenderSliver**: A render object that applies a transformation to the child while it leaves the viewport.
 
 ### Ready-to-use effects
 - **SpinnerSliver**: Rotates its child as it leaves the viewport, with configurable anchor and angle.
