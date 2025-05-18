@@ -1,6 +1,6 @@
 name: sliver_catalog
 description: A set of various slivers that add custom visual behavior.
-version: 0.0.1
+version: 0.1.0
 homepage: "https://github.com/MbIXjkee/sliver_catalog"
 repository: "https://github.com/MbIXjkee/sliver_catalog"
 issue_tracker: "https://github.com/MbIXjkee/sliver_catalog/issues"
