@@ -44,7 +44,7 @@ class DemoSpinnerScreen extends StatelessWidget {
                   builder: (context, value, child) {
                     return CustomPaint(
                       painter: _SquaresPainter(
-                        progress: consumingProgress.value,
+                        progress: value,
                       ),
                     );
                   },
@@ -63,7 +63,7 @@ class DemoSpinnerScreen extends StatelessWidget {
                   builder: (context, value, child) {
                     return CustomPaint(
                       painter: _SquaresPainter(
-                        progress: consumingProgress.value,
+                        progress: value,
                       ),
                     );
                   },
