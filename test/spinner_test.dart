@@ -34,8 +34,10 @@ void main() {
     testWidgets(
       'Use spinner in no scrollable should throw exception',
       (tester) async {
-        final widget = SpinnerSliver(
-          child: Container(),
+        final widget = SizedBox(
+          child: SpinnerSliver(
+            child: Container(),
+          ),
         );
 
         await tester.pumpWidget(widget);
