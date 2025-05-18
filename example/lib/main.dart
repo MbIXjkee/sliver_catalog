@@ -4,8 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:sliver_catalog/sliver_catalog.dart';
 
-/// An example of using ScrollHijackSliver to concsume more space than it
-/// actually takes up.
+/// A basic example of slivers from the package.
 void main() {
   runApp(const MyApp());
 }
@@ -20,13 +19,13 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const DemoSpinnerScreen(),
+      home: const DemoScreen(),
     );
   }
 }
 
-class DemoSpinnerScreen extends StatelessWidget {
-  const DemoSpinnerScreen({super.key});
+class DemoScreen extends StatelessWidget {
+  const DemoScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -52,24 +51,33 @@ class DemoSpinnerScreen extends StatelessWidget {
               );
             },
           ),
-          ScrollHijackSliver(
-            consumingSpaceSize: 800,
-            builder: (context, consumingProgress) {
-              return Container(
-                color: Colors.brown,
-                height: 300,
-                child: ValueListenableBuilder(
-                  valueListenable: consumingProgress,
-                  builder: (context, value, child) {
-                    return CustomPaint(
-                      painter: _SquaresPainter(
-                        progress: value,
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
+          BloodSliver(
+            child: Container(
+              height: 250,
+              color: Colors.green,
+              child: const Center(child: Text("Blood Sliver")),
+            ),
+          ),
+          FreezeSliver(
+            child: Container(
+              height: 250,
+              color: Colors.blue,
+              child: const Center(child: Text("Freeze Sliver")),
+            ),
+          ),
+          SpinnerSliver(
+            child: Container(
+              height: 250,
+              color: Colors.orange,
+              child: const Center(child: Text("Spinner Sliver")),
+            ),
+          ),
+          GliderSliver(
+            child: Container(
+              height: 250,
+              color: Colors.purple,
+              child: const Center(child: Text("Glider Sliver")),
+            ),
           ),
           for (int i = 0; i < 10; i++)
             SliverToBoxAdapter(
