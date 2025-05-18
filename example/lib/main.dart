@@ -43,7 +43,7 @@ class DemoScreen extends StatelessWidget {
                   builder: (context, value, child) {
                     return CustomPaint(
                       painter: _SquaresPainter(
-                        progress: consumingProgress.value,
+                        progress: value,
                       ),
                     );
                   },
