@@ -437,6 +437,34 @@ void main() {
         });
       }
     });
+
+    group('performSpecificHitTestChildren', () {
+      test('should not override hit testing for direct scrolling', () {
+        const constraints = SliverConstraints(
+          axisDirection: AxisDirection.down,
+          growthDirection: GrowthDirection.forward,
+          userScrollDirection: ScrollDirection.idle,
+          scrollOffset: 0,
+          precedingScrollExtent: 0,
+          overlap: 0,
+          remainingPaintExtent: 100,
+          crossAxisExtent: 100,
+          crossAxisDirection: AxisDirection.left,
+          viewportMainAxisExtent: 100,
+          remainingCacheExtent: 100,
+          cacheOrigin: 0,
+        );
+        sliver.layout(constraints);
+
+        final result = sliver.performSpecificHitTestChildren(
+          SliverHitTestResult(),
+          mainAxisPosition: 10,
+          crossAxisPosition: 10,
+        );
+
+        expect(result, isNull);
+      });
+    });
   });
 }
 
