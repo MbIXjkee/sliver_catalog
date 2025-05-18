@@ -3,7 +3,7 @@ import 'package:sliver_catalog/src/base/leaving_viewport_transform_render_sliver
 
 /// The sliver widget that slides left or right while moving out
 /// from the screen.
-/// 
+///
 /// See also:
 /// [SingleChildRenderObjectWidget] a base class implements a transform applied
 /// to the child based on the progress of the leaving.

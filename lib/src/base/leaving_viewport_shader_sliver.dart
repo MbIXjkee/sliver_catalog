@@ -79,7 +79,7 @@ class LeavingViewportShaderSliver extends SingleChildRenderObjectWidget {
     required this.shader,
   });
 
-  /// Convenience constructor of [LeavingViewportShaderSliver] that accepts 
+  /// Convenience constructor of [LeavingViewportShaderSliver] that accepts
   /// a raw [ui.FragmentShader].
   ///
   /// Wraps the provided shader in a [DefaultLeavingViewportShader].
