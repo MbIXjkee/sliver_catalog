@@ -128,10 +128,13 @@ void main() {
       expect(isNeedLayout, isTrue);
     });
 
-    group('performTransform should return correct result', () {
+    group('performTransform should contain correct rotation', () {
       final testCases = [
+        // === VERTICAL, LEFT ANCHOR ===
+        // there is no transformation, we didn't start to rotate
         (
-          description: 'Vertical forward, left anchor, scrollOffset 0',
+          description:
+              'Vertical forward, left anchor, scrollOffset 0, from pi/2',
           axisDirection: AxisDirection.down,
           growthDirection: GrowthDirection.forward,
           crossAxisDirection: AxisDirection.right,
@@ -141,8 +144,10 @@ void main() {
           childConstraints: const BoxConstraints.tightFor(height: 100.0),
           expectedRotation: null,
         ),
+        // there is no transformation, the content is fully out the screen
         (
-          description: 'Vertical forward, left anchor, scrollOffset 100',
+          description:
+              'Vertical forward, left anchor, scrollOffset 100, from pi/2',
           axisDirection: AxisDirection.down,
           growthDirection: GrowthDirection.forward,
           crossAxisDirection: AxisDirection.right,
@@ -150,7 +155,231 @@ void main() {
           maxAngle: 1.57,
           scrollOffset: 100.0,
           childConstraints: const BoxConstraints.tightFor(height: 100.0),
-          expectedRotation: 1.57,
+          expectedRotation: null,
+        ),
+        (
+          description:
+              'Vertical forward, left anchor, scrollOffset 99.9, from pi/2',
+          axisDirection: AxisDirection.down,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.right,
+          anchorSide: SpinnerAnchorSide.left,
+          maxAngle: 1.57,
+          scrollOffset: 99.9,
+          childConstraints: const BoxConstraints.tightFor(height: 100.0),
+          expectedRotation: -1.568,
+        ),
+        (
+          description:
+              'Vertical forward, left anchor, scrollOffset 50, from pi/2',
+          axisDirection: AxisDirection.down,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.right,
+          anchorSide: SpinnerAnchorSide.left,
+          maxAngle: 1.57,
+          scrollOffset: 50.0,
+          childConstraints: const BoxConstraints.tightFor(height: 100.0),
+          expectedRotation: -0.785,
+        ),
+        (
+          description: 'Vertical forward, left anchor, scrollOffset 50, from 1',
+          axisDirection: AxisDirection.down,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.right,
+          anchorSide: SpinnerAnchorSide.left,
+          maxAngle: 1.0,
+          scrollOffset: 50.0,
+          childConstraints: const BoxConstraints.tightFor(height: 100.0),
+          expectedRotation: -0.5,
+        ),
+        // === VERTICAL, RIGHT ANCHOR ===
+        // No transformation: content just entered the viewport
+        (
+          description:
+              'Vertical forward, right anchor, scrollOffset 0, from pi/2',
+          axisDirection: AxisDirection.down,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.right,
+          anchorSide: SpinnerAnchorSide.right,
+          maxAngle: 1.57,
+          scrollOffset: 0.0,
+          childConstraints: const BoxConstraints.tightFor(height: 100.0),
+          expectedRotation: null,
+        ),
+        // No transformation: content fully left the viewport
+        (
+          description:
+              'Vertical forward, right anchor, scrollOffset 100, from pi/2',
+          axisDirection: AxisDirection.down,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.right,
+          anchorSide: SpinnerAnchorSide.right,
+          maxAngle: 1.57,
+          scrollOffset: 100.0,
+          childConstraints: const BoxConstraints.tightFor(height: 100.0),
+          expectedRotation: null,
+        ),
+        (
+          description:
+              'Vertical forward, right anchor, scrollOffset 99.9, from pi/2',
+          axisDirection: AxisDirection.down,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.right,
+          anchorSide: SpinnerAnchorSide.right,
+          maxAngle: 1.57,
+          scrollOffset: 99.9,
+          childConstraints: const BoxConstraints.tightFor(height: 100.0),
+          expectedRotation: 1.568,
+        ),
+        (
+          description:
+              'Vertical forward, right anchor, scrollOffset 50, from pi/2',
+          axisDirection: AxisDirection.down,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.right,
+          anchorSide: SpinnerAnchorSide.right,
+          maxAngle: 1.57,
+          scrollOffset: 50.0,
+          childConstraints: const BoxConstraints.tightFor(height: 100.0),
+          expectedRotation: 0.785,
+        ),
+        (
+          description:
+              'Vertical forward, right anchor, scrollOffset 50, from 1',
+          axisDirection: AxisDirection.down,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.right,
+          anchorSide: SpinnerAnchorSide.right,
+          maxAngle: 1.0,
+          scrollOffset: 50.0,
+          childConstraints: const BoxConstraints.tightFor(height: 100.0),
+          expectedRotation: 0.5,
+        ),
+        // === HORIZONTAL, RIGHT ANCHOR ===
+        // No transformation: just entering
+        (
+          description:
+              'Horizontal forward, right anchor, scrollOffset 0, from pi/2',
+          axisDirection: AxisDirection.right,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.down,
+          anchorSide: SpinnerAnchorSide.right,
+          maxAngle: 1.57,
+          scrollOffset: 0.0,
+          childConstraints: const BoxConstraints.tightFor(width: 100.0),
+          expectedRotation: null,
+        ),
+        // No transformation: fully out
+        (
+          description:
+              'Horizontal forward, right anchor, scrollOffset 100, from pi/2',
+          axisDirection: AxisDirection.right,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.down,
+          anchorSide: SpinnerAnchorSide.right,
+          maxAngle: 1.57,
+          scrollOffset: 100.0,
+          childConstraints: const BoxConstraints.tightFor(width: 100.0),
+          expectedRotation: null,
+        ),
+        (
+          description:
+              'Horizontal forward, right anchor, scrollOffset 99.9, from pi/2',
+          axisDirection: AxisDirection.right,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.down,
+          anchorSide: SpinnerAnchorSide.right,
+          maxAngle: 1.57,
+          scrollOffset: 99.9,
+          childConstraints: const BoxConstraints.tightFor(width: 100.0),
+          expectedRotation: 1.568,
+        ),
+        (
+          description:
+              'Horizontal forward, right anchor, scrollOffset 50, from pi/2',
+          axisDirection: AxisDirection.right,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.down,
+          anchorSide: SpinnerAnchorSide.right,
+          maxAngle: 1.57,
+          scrollOffset: 50.0,
+          childConstraints: const BoxConstraints.tightFor(width: 100.0),
+          expectedRotation: 0.785,
+        ),
+        (
+          description:
+              'Horizontal forward, right anchor, scrollOffset 50, from 1',
+          axisDirection: AxisDirection.right,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.down,
+          anchorSide: SpinnerAnchorSide.right,
+          maxAngle: 1.0,
+          scrollOffset: 50.0,
+          childConstraints: const BoxConstraints.tightFor(width: 100.0),
+          expectedRotation: 0.5,
+        ),
+        // === HORIZONTAL, LEFT ANCHOR ===
+        // No transformation: just entering
+        (
+          description:
+              'Horizontal forward, left anchor, scrollOffset 0, from pi/2',
+          axisDirection: AxisDirection.right,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.down,
+          anchorSide: SpinnerAnchorSide.left,
+          maxAngle: 1.57,
+          scrollOffset: 0.0,
+          childConstraints: const BoxConstraints.tightFor(width: 100.0),
+          expectedRotation: null,
+        ),
+        // No transformation: fully out
+        (
+          description:
+              'Horizontal forward, left anchor, scrollOffset 100, from pi/2',
+          axisDirection: AxisDirection.right,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.down,
+          anchorSide: SpinnerAnchorSide.left,
+          maxAngle: 1.57,
+          scrollOffset: 100.0,
+          childConstraints: const BoxConstraints.tightFor(width: 100.0),
+          expectedRotation: null,
+        ),
+        (
+          description:
+              'Horizontal forward, left anchor, scrollOffset 99.9, from pi/2',
+          axisDirection: AxisDirection.right,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.down,
+          anchorSide: SpinnerAnchorSide.left,
+          maxAngle: 1.57,
+          scrollOffset: 99.9,
+          childConstraints: const BoxConstraints.tightFor(width: 100.0),
+          expectedRotation: -1.568,
+        ),
+        (
+          description:
+              'Horizontal forward, left anchor, scrollOffset 50, from pi/2',
+          axisDirection: AxisDirection.right,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.down,
+          anchorSide: SpinnerAnchorSide.left,
+          maxAngle: 1.57,
+          scrollOffset: 50.0,
+          childConstraints: const BoxConstraints.tightFor(width: 100.0),
+          expectedRotation: -0.785,
+        ),
+        (
+          description:
+              'Horizontal forward, left anchor, scrollOffset 50, from 1',
+          axisDirection: AxisDirection.right,
+          growthDirection: GrowthDirection.forward,
+          crossAxisDirection: AxisDirection.down,
+          anchorSide: SpinnerAnchorSide.left,
+          maxAngle: 1.0,
+          scrollOffset: 50.0,
+          childConstraints: const BoxConstraints.tightFor(width: 100.0),
+          expectedRotation: -0.5,
         ),
       ];
 
@@ -177,7 +406,7 @@ void main() {
             overlap: 0.0,
             remainingPaintExtent: 600.0,
             crossAxisExtent: 300.0,
-            crossAxisDirection: AxisDirection.right,
+            crossAxisDirection: crossAxisDirection,
             viewportMainAxisExtent: 600.0,
             remainingCacheExtent: 850.0,
             cacheOrigin: clampDouble(-scrollOffset, 0, 250),
@@ -212,5 +441,8 @@ void main() {
 }
 
 double _getActualRotationByMatrix(Matrix4 matrix) {
-  return 0.0;
+  final a = matrix.entry(0, 0);
+  final b = matrix.entry(1, 0);
+
+  return math.atan2(b, a);
 }
