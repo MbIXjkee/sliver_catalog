@@ -24,4 +24,6 @@ jobs:
 
       - name: Run tests and upload coverage
         uses: ./.github/actions/tests-with-coverage
+        with:
+          codecov_token: ${{ secrets.CODECOV_TOKEN }}
         
