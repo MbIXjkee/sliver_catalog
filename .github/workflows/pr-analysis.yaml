@@ -61,13 +61,8 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Run tests
-        run: flutter test --coverage
-      
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Run tests and upload coverage
+        uses: ./.github/actions/tests-with-coverage
 
   build_android_example:
     needs: testing
