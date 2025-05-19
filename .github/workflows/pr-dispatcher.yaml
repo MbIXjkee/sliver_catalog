@@ -19,12 +19,12 @@ jobs:
             echo "strict=false" >> $GITHUB_OUTPUT
           fi
 
-  run_strict:
+  release_candidate:
     needs: dispatch
     if: needs.dispatch.outputs.strict == 'true'
     uses: ./.github/workflows/pr-release-candidate-analysis.yaml
 
-  run_default:
+  regular_pr:
     needs: dispatch
     if: needs.dispatch.outputs.strict == 'false'
     uses: ./.github/workflows/pr-regular-analysis.yaml
