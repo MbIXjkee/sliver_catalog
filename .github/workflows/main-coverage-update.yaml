@@ -1,0 +1,37 @@
+name: "Upload coverage on changes in main"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare Flutter
+        uses: ./.github/actions/flutter-setup
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test --coverage
+
+      - name: Show coverage summary
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lcov
+          lcov --summary coverage/lcov.info
+ 
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
