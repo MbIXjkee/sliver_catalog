@@ -1,9 +1,7 @@
-name: "Pull Request Analysis"
+name: "Pre-release analysis"
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_call:
 
 jobs:
   analysis:
@@ -38,11 +36,6 @@ jobs:
 
       - name: Run static code analysis
         run: flutter analyze --fatal-warnings --fatal-infos .
-
-      - name: Run PANA analysis
-        uses: axel-op/dart-package-analyzer@v3
-        with:
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
 
   testing:
     needs: analysis
@@ -129,3 +122,50 @@ jobs:
           cd example
           flutter pub get
           flutter build web
+  
+  release_checks:
+    needs: [build_android_example, build_ios_example, build_web_example]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare Flutter
+        uses: ./.github/actions/flutter-setup
+
+      - name: Test pub publish
+        run: flutter pub publish --dry-run
+
+      - name: Run PANA analysis
+        uses: axel-op/dart-package-analyzer@v3
+        id: pana
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate PANA score
+        env:
+          ACTUAL: ${{ steps.pana.outputs.total }}
+          MAX: ${{ steps.pana.outputs.total_max }}
+        run: |
+          echo "Current score: $ACTUAL / $MAX"
+
+          if [[ "$ACTUAL" != "$MAX" ]]; then
+            echo "❌ PANA score doesn't match expectations ❌"
+            exit 1
+          fi
+      
+      - name: Check the version description in CHANGELOG
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{ print $2 }')
+          echo "Checking if version $VERSION is listed in CHANGELOG.md..."
+          
+          if ! grep -q "^## $VERSION" CHANGELOG.md; then
+            echo "❌ Version $VERSION not found as a heading in CHANGELOG.md"
+            exit 1
+          fi
+          
+          echo "✅ Version $VERSION found in CHANGELOG.md"

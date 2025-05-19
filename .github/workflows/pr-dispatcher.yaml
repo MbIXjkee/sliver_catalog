@@ -1,0 +1,30 @@
+name: "PR Workflow Dispatcher"
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    outputs:
+      strict: ${{ steps.choose-flow.outputs.strict }}
+    steps:
+      - id: choose-flow
+        run: |
+          if [[ "${GITHUB_HEAD_REF}" == prepare_release_* ]]; then
+            echo "strict=true" >> $GITHUB_OUTPUT
+          else
+            echo "strict=false" >> $GITHUB_OUTPUT
+          fi
+
+  run_strict:
+    needs: dispatch
+    if: needs.dispatch.outputs.strict == 'true'
+    uses: ./.github/workflows/pr-release-candidate-analysis.yaml
+
+  run_default:
+    needs: dispatch
+    if: needs.dispatch.outputs.strict == 'false'
+    uses: ./.github/workflows/pr-regular-analysis.yaml
