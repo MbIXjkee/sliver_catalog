@@ -18,7 +18,7 @@ void main() {
       tearDown(() {
         controller.dispose();
       });
-      
+
       Widget createTestWidget({
         ScrollHijackProgressBehavior behavior =
             ScrollHijackProgressBehavior.onlyConsumingSpace,
