@@ -1,4 +1,4 @@
-name: pr_analysis
+name: "Pull Request Analysis"
 
 on:
   pull_request:
@@ -22,14 +22,9 @@ jobs:
           files: "lib, test, example, pubspec.yaml, README.md, CHANGELOG.md, LICENSE"
           allow_failure: true
 
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
+      - name: Prepare Flutter
+        uses: ./.github/actions/flutter-setup
       
-      - name: Flutter version info
-        run: flutter --version
-
       - name: Install dependencies
         run: flutter pub get
 
@@ -60,13 +55,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-      
-      - name: Flutter version info
-        run: flutter --version
+      - name: Prepare Flutter
+        uses: ./.github/actions/flutter-setup
 
       - name: Install dependencies
         run: flutter pub get
@@ -96,13 +86,8 @@ jobs:
           java-version: '17'
           distribution: 'adopt'
 
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-      
-      - name: Flutter version info
-        run: flutter --version
+      - name: Prepare Flutter
+        uses: ./.github/actions/flutter-setup
 
       - name: Build Example Android
         run: |
@@ -121,10 +106,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
+      - name: Prepare Flutter
+        uses: ./.github/actions/flutter-setup
 
       - name: Build iOS
         run: |
@@ -143,13 +126,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-
-      - name: Flutter version info
-        run: flutter --version
+      - name: Prepare Flutter
+        uses: ./.github/actions/flutter-setup
 
       - name: Build Example Web
         run: |
