@@ -1,0 +1,29 @@
+name: "Tests with coverage"
+description: "Runs tests with coverage and uploads the results to Codecov"
+
+inputs:
+  codecov_token:
+    required: true
+    description: "Codecov token"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run tests
+      run: flutter test --coverage
+      shell: bash
+
+    # Calculate it manually to avoid waste time installing lcov
+    - name: Show coverage summary
+      run: |
+        TOTAL=$(grep -c ^DA: coverage/lcov.info)
+        COVERED=$(grep ^DA: coverage/lcov.info | awk -F, '$2 > 0' | wc -l)
+        echo "Covered lines: $COVERED / $TOTAL"
+        PERCENT=$(( 100 * COVERED / TOTAL ))
+        echo "Line coverage: $PERCENT%"
+      shell: bash
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ inputs.codecov_token }}
