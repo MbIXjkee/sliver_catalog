@@ -1,6 +1,10 @@
 ## Unreleased
 * 
 
+## 0.1.2
+### Added
+* Detailed Readme documentation for the package.
+
 ## 0.1.1
 ### Added
 * A basic Readme for the package. 
