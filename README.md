@@ -80,6 +80,75 @@ CustomScrollView(
 )
 ```
 
+### LeavingViewportShaderSliver
+
+A sliver that applies a fragment shader effect to its child as it leaves the viewport. This enables advanced visual effects as the user scrolls.
+
+**Key features:**
+- Can operate with a raw `FragmentShader` that uses a specific order of arguments (size, offset, progress), or with a custom shader wrapper for any uniform order via the `LeavingViewportShader` interface.
+- The shader receives the child's size, paint offset, and a progress value (0.0–1.0) indicating how much the child has left the viewport.
+
+**Example:**
+```dart
+CustomScrollView(
+  slivers: [
+    // Using a raw FragmentShader (default uniform order)
+    LeavingViewportShaderSliver.fromFragmentShader(
+      shader: myFragmentShader,
+      child: Image.network('https://...'),
+    ),
+    // Using a custom wrapper for arbitrary uniform order
+    LeavingViewportShaderSliver(
+      shader: MyCustomLeavingViewportShader(),
+      child: Image.network('https://...'),
+    ),
+    // ... other slivers ...
+  ],
+)
+```
+
+There are also two built-in inheritances of `LeavingViewportShaderSliver`:
+
+#### FreezeSliver
+
+A sliver that applies a "freezing" shader effect to its child as it leaves the viewport. This effect is built-in and requires no manual shader setup.
+
+**Key features:**
+- Uses a predefined freezing shader bundled with the package.
+- No shader code required—just wrap a content with the sliver.
+
+**Example:**
+```dart
+CustomScrollView(
+  slivers: [
+    FreezeSliver(
+      child: Image.network('https://...'),
+    ),
+    // ... other slivers ...
+  ],
+)
+```
+
+#### BloodSliver
+
+A sliver that applies a "blood covering" shader effect to its child as it leaves the viewport. This effect is built-in and requires no manual shader setup.
+
+**Key features:**
+- Uses a predefined blood shader bundled with the package.
+- No shader code required—just wrap a content with the sliver.
+
+**Example:**
+```dart
+CustomScrollView(
+  slivers: [
+    BloodSliver(
+      child: Image.network('https://...'),
+    ),
+    // ... other slivers ...
+  ],
+)
+```
+
 ## Maintainer
 <a href="https://github.com/MbIXjkee">
     <div style="display: inline-block;">
