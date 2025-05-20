@@ -20,11 +20,11 @@
 A collection of experimental and creative slivers for Flutter. Extend your scrolling experience beyond the basics.
 
 <p align="center">
-  <img src="https://i.ibb.co/pvZdYdmv/spinner.gif" alt="SpinnerSliver demo" height="180">
-  <img src="https://i.ibb.co/Qv7n5BXH/glider.gif" alt="GliderSliver demo" height="180">
-  <img src="https://i.ibb.co/4ZFr8j73/freeze.gif" alt="FreezeSliver demo" height="180">
-  <img src="https://raw.githubusercontent.com/MbIXjkee/sliver_catalog/refs/heads/image_storage/images/blood.gif" alt="BloodSliver demo" height="180">
-  <img src="https://i.ibb.co/QxWS9Xd/hijack.gif" alt="ScrollHijackSliver demo" height="180">
+  <img src="https://raw.githubusercontent.com/MbIXjkee/sliver_catalog/refs/heads/image_storage/images/hijack.gif" alt="ScrollHijackSliver demo" width="180">
+  <img src="https://raw.githubusercontent.com/MbIXjkee/sliver_catalog/refs/heads/image_storage/images/spinner.gif" alt="SpinnerSliver demo" width="180">
+  <img src="https://raw.githubusercontent.com/MbIXjkee/sliver_catalog/refs/heads/image_storage/images/glider.gif" alt="GliderSliver demo" width="180">
+  <img src="https://raw.githubusercontent.com/MbIXjkee/sliver_catalog/refs/heads/image_storage/images/freeze.gif" alt="FreezeSliver demo" width="180">
+  <img src="https://raw.githubusercontent.com/MbIXjkee/sliver_catalog/refs/heads/image_storage/images/blood.gif" alt="BloodSliver demo" width="180">
 </p>
 
 # Overview
