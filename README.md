@@ -10,7 +10,7 @@
     <a href="https://pub.dev/packages/sliver_catalog"><img src="https://badgen.net/pub/points/sliver_catalog" alt="Pub points"></a>
     <a href="https://pub.dev/packages/sliver_catalog"><img src="https://badgen.net/pub/likes/sliver_catalog" alt="Pub Likes"></a>
     <a href="https://pub.dev/packages/sliver_catalog"><img src="https://img.shields.io/pub/dm/sliver_catalog" alt="Downloads"></a>
-    <a href="https://codecov.io/gh/MbIXjkee/sliver_catalog"><img src="https://codecov.io/gh/MbIXjkee/sliver_catalog/graph/badge.svg?token=H59EM63BS8"/></a>
+    <a href="https://codecov.io/gh/MbIXjkee/sliver_catalog"><img src="https://codecov.io/gh/MbIXjkee/sliver_catalog/graph/badge.svg?token=H59EM63BS8" alt="Coverage Status"/></a>
     <a href="https://github.com/MbIXjkee/sliver_catalog/graphs/contributors"><img src="https://badgen.net/github/contributors/MbIXjkee/sliver_catalog" alt="Contributors"></a>
     <a href="https://github.com/MbIXjkee/sliver_catalog/blob/main/LICENSE"><img src="https://badgen.net/github/license/MbIXjkee/sliver_catalog" alt="License"></a>
 </p>
