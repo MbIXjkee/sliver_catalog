@@ -44,6 +44,42 @@ Sliver Catalog provides a set of advanced and experimental slivers for Flutter, 
 - **FreezeSliver**: Applies a freezing effect to the child while it leaves the viewport.
 - **BloodSliver**: Applies a blood covering effect to the child while it leaves the viewport.
 
+## Explore the library
+
+### ScrollHijackSliver
+
+A sliver that consumes a specified amount of scrollable space before allowing its child to start scrolling. This is useful for creating custom scroll-driven animations and effects.
+
+**Key features:**
+- Exposes a `ValueListenable<double>` progress (0.0–1.0) to the builder, so you can animate your child based on the progress.
+- Supports different progress calculation behaviors via `ScrollHijackProgressBehavior`.
+
+**Example:**
+```dart
+CustomScrollView(
+  slivers: [
+    ScrollHijackSliver(
+      consumingSpaceSize: 800,
+      builder: (context, consumingProgress) {
+        return Container(
+          color: Colors.grey,
+          height: 300,
+          child: ValueListenableBuilder(
+            valueListenable: consumingProgress,
+            builder: (context, value, child) {
+              return CustomPaint(
+                painter: MyCustomPainter(progress: value),
+              );
+            },
+          ),
+        );
+      },
+    ),
+    // ... other slivers ...
+  ],
+)
+```
+
 ## Maintainer
 <a href="https://github.com/MbIXjkee">
     <div style="display: inline-block;">
