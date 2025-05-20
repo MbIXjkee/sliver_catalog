@@ -21,6 +21,14 @@
 
 A collection of experimental and creative slivers for Flutter. Extend your scrolling experience beyond the basics.
 
+<p align="center">
+  <img src="https://i.ibb.co/pvZdYdmv/spinner.gif" alt="SpinnerSliver demo" height="180">
+  <img src="https://i.ibb.co/Qv7n5BXH/glider.gif" alt="GliderSliver demo" height="180">
+  <img src="https://i.ibb.co/4ZFr8j73/freeze.gif" alt="FreezeSliver demo" height="180">
+  <img src="https://i.ibb.co/JRBjg1RR/blood.gif" alt="BloodSliver demo" height="180">
+  <img src="https://i.ibb.co/QxWS9Xd/hijack.gif" alt="ScrollHijackSliver demo" height="180">
+</p>
+
 ## Overview
 
 Sliver Catalog provides a set of advanced and experimental slivers for Flutter, enabling developers to create unique, visually engaging scroll effects. The package includes basic slivers as a platform for creating effects and specific implementations that provide ready-to-use effects.
