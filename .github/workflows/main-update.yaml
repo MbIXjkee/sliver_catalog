@@ -28,7 +28,7 @@ jobs:
           codecov_token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Deploy an example
-        uses: ./.github/actions/deploy_example
+        uses: ./.github/actions/deploy-example
         with:
           destination_dir: latest
         
