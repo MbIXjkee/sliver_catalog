@@ -31,4 +31,5 @@ jobs:
         uses: ./.github/actions/deploy-example
         with:
           destination_dir: latest
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
         
