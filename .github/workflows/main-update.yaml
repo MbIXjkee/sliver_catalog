@@ -1,4 +1,4 @@
-name: "Upload coverage on changes in main"
+name: "Chore after updates in the main branch"
 
 on:
   push:
@@ -26,4 +26,9 @@ jobs:
         uses: ./.github/actions/tests-with-coverage
         with:
           codecov_token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Deploy an example
+        uses: ./.github/actions/deploy_example
+        with:
+          destination_dir: latest
         
