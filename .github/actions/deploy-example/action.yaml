@@ -9,7 +9,6 @@ inputs:
     description: "Github token"
     required: true
 
-
 runs:
   using: "composite"
   steps:
@@ -17,7 +16,7 @@ runs:
       run: |
         cd example
         flutter pub get
-        flutter build web --base-href "/${{ inputs.destination_dir }}/" --release
+        flutter build web --base-href "/sliver_catalog/${{ inputs.destination_dir }}/" --release
       shell: bash
 
     - name: Deploy example to GitHub Pages
