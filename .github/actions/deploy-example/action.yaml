@@ -1,0 +1,29 @@
+name: "Deploy example to GitHub Pages"
+description: "Builds the exampleand deploys it to gh-pages under a subdirectory"
+
+inputs:
+  destination_dir:
+    description: "Target subdirectory on gh-pages"
+    required: true
+  gh_token:
+    description: "Github token"
+    required: true
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Build example
+      run: |
+        cd example
+        flutter pub get
+        flutter build web --release
+      shell: bash
+
+    - name: Deploy example to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ inputs.gh_token }}
+        publish_dir: example/build/web
+        destination_dir: ${{ inputs.destination_dir }}
+        publish_branch: gh-pages
