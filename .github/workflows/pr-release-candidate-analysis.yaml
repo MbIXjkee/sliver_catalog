@@ -2,6 +2,10 @@ name: "Pre-release analysis"
 
 on:
   workflow_call:
+    inputs:
+      version:
+        type: string
+        required: true
 
 jobs:
   analysis:
@@ -160,14 +164,32 @@ jobs:
             exit 1
           fi
       
-      - name: Check the version description in CHANGELOG
+      - name: Check pubspec version matches input
         run: |
-          VERSION=$(grep '^version:' pubspec.yaml | awk '{ print $2 }')
-          echo "Checking if version $VERSION is listed in CHANGELOG.md..."
-          
-          if ! grep -q "^## $VERSION" CHANGELOG.md; then
-            echo "❌ Version $VERSION not found as a heading in CHANGELOG.md"
+          ACTUAL_VERSION=$(grep '^version:' pubspec.yaml | cut -d ':' -f2 | xargs)
+          EXPECTED_VERSION="${{ inputs.version }}"
+          echo "Expected version: $EXPECTED_VERSION, found in pubspec.yaml: $ACTUAL_VERSION"
+          if [[ "$ACTUAL_VERSION" != "$EXPECTED_VERSION" ]]; then
+            echo "❌ Version mismatch!"
             exit 1
           fi
-          
-          echo "✅ Version $VERSION found in CHANGELOG.md"
+          echo "✅ pubspec.yaml version matches input"
+
+      - name: Check the version heading in CHANGELOG.md
+        run: |
+          EXPECTED_VERSION="${{ inputs.version }}"
+          if ! grep -q "^## $EXPECTED_VERSION" CHANGELOG.md; then
+            echo "❌ Version $EXPECTED_VERSION not found as heading in CHANGELOG.md"
+            exit 1
+          fi
+          echo "✅ CHANGELOG.md contains version $EXPECTED_VERSION"
+
+      - name: Check release link in README.md
+        run: |
+          EXPECTED_VERSION="${{ inputs.version }}"
+          URL="https://mbixjkee.github.io/sliver_catalog/release_${EXPECTED_VERSION}"
+          if ! grep -qF "$URL" README.md; then
+            echo "❌ Release link for version $EXPECTED_VERSION not found in README.md"
+            exit 1
+          fi
+          echo "✅ README.md contains release link $URL"

@@ -10,19 +10,26 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       strict: ${{ steps.choose-flow.outputs.strict }}
+      version: ${{ steps.choose-flow.outputs.version }}
     steps:
       - id: choose-flow
         run: |
-          if [[ "${GITHUB_HEAD_REF}" == prepare_release_* ]]; then
+          BRANCH=${GITHUB_HEAD_REF}
+          if [[ "$BRANCH" == prepare_release_* ]]; then
+            VER=${BRANCH#prepare_release_}
             echo "strict=true" >> $GITHUB_OUTPUT
+            echo "version=$VER" >> $GITHUB_OUTPUT
           else
             echo "strict=false" >> $GITHUB_OUTPUT
+            echo "version=" >> $GITHUB_OUTPUT
           fi
 
   release_candidate:
     needs: dispatch
     if: needs.dispatch.outputs.strict == 'true'
     uses: ./.github/workflows/pr-release-candidate-analysis.yaml
+    with:
+      version: ${{ needs.dispatch.outputs.version }}
 
   regular_pr:
     needs: dispatch
