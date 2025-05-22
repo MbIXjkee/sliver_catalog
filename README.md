@@ -19,12 +19,25 @@
 
 A collection of experimental and creative slivers for Flutter. Extend your scrolling experience beyond the basics.
 
-<p align="center">
+### Gallery
+
+<p align="center" style="max-width:550px; margin:auto;">
   <img src="https://raw.githubusercontent.com/MbIXjkee/sliver_catalog/refs/heads/image_storage/images/hijack.gif" alt="ScrollHijackSliver demo" width="180">
   <img src="https://raw.githubusercontent.com/MbIXjkee/sliver_catalog/refs/heads/image_storage/images/spinner.gif" alt="SpinnerSliver demo" width="180">
   <img src="https://raw.githubusercontent.com/MbIXjkee/sliver_catalog/refs/heads/image_storage/images/glider.gif" alt="GliderSliver demo" width="180">
   <img src="https://raw.githubusercontent.com/MbIXjkee/sliver_catalog/refs/heads/image_storage/images/freeze.gif" alt="FreezeSliver demo" width="180">
   <img src="https://raw.githubusercontent.com/MbIXjkee/sliver_catalog/refs/heads/image_storage/images/blood.gif" alt="BloodSliver demo" width="180">
+</p>
+
+### Demo
+
+<p>
+  <a href="https://mbixjkee.github.io/sliver_catalog/release_0.1.2/" target="_blank" rel="noopener">
+    <img src="https://img.shields.io/badge/current_release-Demo-blue?style=for-the-badge" alt="Current release" />
+  </a>
+    <a href="https://mbixjkee.github.io/sliver_catalog/latest/" target="_blank" rel="noopener">
+    <img src="https://img.shields.io/badge/Latest-Demo-blue?style=for-the-badge" alt="Latest Demo" />
+  </a>
 </p>
 
 # Overview
