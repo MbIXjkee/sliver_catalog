@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sliver_catalog/sliver_catalog.dart';
+import 'package:sliver_catalog/src/spinner.dart';
 
 void main() {
   group('SpinnerSliver', () {
