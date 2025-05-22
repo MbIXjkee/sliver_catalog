@@ -1,6 +1,12 @@
 ## Unreleased
 * 
 
+## 0.1.3
+### Added
+* Links to interactive demo in documentation.
+### Changed
+* Internal implementations that should not have been exported are removed from the export.
+
 ## 0.1.2
 ### Added
 * Detailed Readme documentation for the package.
