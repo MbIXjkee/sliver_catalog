@@ -12,7 +12,8 @@ jobs:
       strict: ${{ steps.choose-flow.outputs.strict }}
       version: ${{ steps.choose-flow.outputs.version }}
     steps:
-      - id: choose-flow
+      - name: Choose PR workflow
+        id: choose-flow
         run: |
           BRANCH=${GITHUB_HEAD_REF}
           if [[ "$BRANCH" == prepare_release_* ]]; then
