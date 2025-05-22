@@ -68,7 +68,10 @@ jobs:
             fi
 
             echo "✅ Version $VERSION is not yet published"
-            
+
+        - name: Setup Dart (configure Config)
+          uses: dart-lang/setup-dart@v1
+
         - name: Prepare Flutter
           uses: ./.github/actions/flutter-setup
 
