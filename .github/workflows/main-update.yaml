@@ -7,6 +7,7 @@ on:
 
 jobs:
   coverage:
+    name: Update coverage report
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -27,9 +28,25 @@ jobs:
         with:
           codecov_token: ${{ secrets.CODECOV_TOKEN }}
 
+  deploy-example:
+    name: Deploy example to GitHub Pages
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare Flutter
+        uses: ./.github/actions/flutter-setup
+
+      - name: Install dependencies
+        run: flutter pub get
+
       - name: Deploy an example
         uses: ./.github/actions/deploy-example
         with:
           destination_dir: latest
           gh_token: ${{ secrets.GITHUB_TOKEN }}
-        
