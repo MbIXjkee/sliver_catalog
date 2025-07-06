@@ -20,13 +20,13 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const DemoSpinnerScreen(),
+      home: const DemoScrollHijackScreen(),
     );
   }
 }
 
-class DemoSpinnerScreen extends StatelessWidget {
-  const DemoSpinnerScreen({super.key});
+class DemoScrollHijackScreen extends StatelessWidget {
+  const DemoScrollHijackScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

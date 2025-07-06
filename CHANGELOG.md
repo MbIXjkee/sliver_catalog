@@ -1,5 +1,5 @@
 ## Unreleased
-* 
+* Corrected scroll offset is used for `hasVisualOverflow` calculation, to avoid clipping when it is not necessary.
 
 ## 0.1.3
 ### Added

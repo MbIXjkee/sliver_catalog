@@ -279,7 +279,7 @@ class _HijackRenderSliver extends RenderSliver
       maxPaintExtent: childExtent,
       hitTestExtent: paintedChildSize,
       hasVisualOverflow: childExtent > constraints.remainingPaintExtent ||
-          constraints.scrollOffset > 0.0,
+          _correctedScrollOffset > 0.0,
     );
     _setChildParentData(child!, constraints, geometry!);
     _updateConsumingProgress();
