@@ -397,22 +397,8 @@ class _HijackRenderSliver extends RenderSliver
     );
 
     final paintOffset = switch (actualGrowthDirection) {
-      AxisDirection.up => _isConsumingSpace
-          ? Offset.zero
-          : Offset(
-              0.0,
-              geometry.paintExtent +
-                  constraints.scrollOffset -
-                  geometry.scrollExtent,
-            ),
-      AxisDirection.left => _isConsumingSpace
-          ? Offset.zero
-          : Offset(
-              geometry.paintExtent +
-                  constraints.scrollOffset -
-                  geometry.scrollExtent,
-              0.0,
-            ),
+      AxisDirection.up => Offset.zero,
+      AxisDirection.left => Offset.zero,
       AxisDirection.right =>
         _isConsumingSpace ? Offset.zero : Offset(-_correctedScrollOffset, 0.0),
       AxisDirection.down =>
