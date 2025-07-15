@@ -1,4 +1,7 @@
 ## Unreleased
+
+## 0.1.4
+### Changed
 * Corrected scroll offset is used for `hasVisualOverflow` calculation, to avoid clipping when it is not necessary.
 * Simplify child paintOffset calculation of ScrollHijackSliver for case of reverse scrolling.
 
