@@ -32,7 +32,7 @@ A collection of experimental and creative slivers for Flutter. Extend your scrol
 ### Demo
 
 <p>
-  <a href="https://mbixjkee.github.io/sliver_catalog/release_0.1.3/" target="_blank" rel="noopener">
+  <a href="https://mbixjkee.github.io/sliver_catalog/release_0.1.4/" target="_blank" rel="noopener">
     <img src="https://img.shields.io/badge/current_release-Demo-blue?style=for-the-badge" alt="Current release" />
   </a>
     <a href="https://mbixjkee.github.io/sliver_catalog/latest/" target="_blank" rel="noopener">
